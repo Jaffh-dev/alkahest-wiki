@@ -17,6 +17,32 @@
         return tool.querySelector('[data-field="' + name + '"]');
     }
 
+    var enchantList = tool.querySelector("[data-enchant-list]");
+
+    /** Adds one enchantment row: id, level and a remove button. */
+    function addEnchantRow(id, level) {
+        var el = Alkahest.site.el;
+        var row = el("div", { className: "tool__row" }, [
+            el("label", null, ["Enchantment id", el("input", { type: "text", "data-enchant-id": true, value: id || "", placeholder: "minecraft:looting", spellcheck: "false" })]),
+            el("label", null, ["Level", el("input", { type: "number", "data-enchant-level": true, value: String(level === undefined ? 3 : level), min: "0", max: "255", step: "1" })]),
+            el("button", { type: "button", className: "button button--ghost tool__remove", "data-remove-enchant": true, "aria-label": "Remove this enchantment" }, ["Remove"])
+        ]);
+        enchantList.appendChild(row);
+        return row;
+    }
+
+    /** Returns the filled enchantment rows, in order. */
+    function readEnchantments() {
+        var list = [];
+        Array.prototype.forEach.call(enchantList.querySelectorAll(".tool__row"), function (row) {
+            var id = row.querySelector("[data-enchant-id]").value.trim();
+            if (!id) return;
+            var level = Math.max(0, Math.min(255, parseInt(row.querySelector("[data-enchant-level]").value, 10) || 0));
+            list.push({ id: id, level: level });
+        });
+        return list;
+    }
+
     function value(name) {
         return field(name).value.trim();
     }
@@ -52,13 +78,20 @@
         var runs = parseInt(value("runs"), 10);
         if (runs > 0) parts.push(String(Math.min(runs, 1000000)));
 
-        var enchant = value("enchant");
-        if (enchant) {
+        var enchants = readEnchantments();
+        if (enchants.length) {
             if (hasNoPlayer) {
                 notes.push("Enchantments are refused on lightning and periodic: there is no held item.");
             } else {
-                var level = Math.max(0, Math.min(255, parseInt(value("level"), 10) || 0));
-                parts.push("enchant [{id:\"" + enchant + "\",lvl:" + level + "}]");
+                var seen = {};
+                enchants.forEach(function (e) {
+                    var id = e.id.indexOf(":") === -1 ? "minecraft:" + e.id : e.id;
+                    if (seen[id]) notes.push(id + " is listed twice: the command refuses a repeated enchantment.");
+                    seen[id] = true;
+                });
+                parts.push("enchant [" + enchants.map(function (e) {
+                    return "{id:\"" + e.id + "\",lvl:" + e.level + "}";
+                }).join(",") + "]");
             }
         }
 
@@ -89,6 +122,15 @@
         note.textContent = notes.join(" ");
     }
 
+    tool.addEventListener("click", function (event) {
+        if (event.target.closest("[data-add-enchant]")) {
+            addEnchantRow("", 3).querySelector("input").focus();
+            build();
+        } else if (event.target.closest("[data-remove-enchant]")) {
+            event.target.closest(".tool__row").remove();
+            build();
+        }
+    });
     tool.addEventListener("input", build);
     tool.addEventListener("change", function (event) {
         if (event.target === field("kind")) {
@@ -96,5 +138,6 @@
         }
         build();
     });
+    addEnchantRow("", 3);
     build();
 })();

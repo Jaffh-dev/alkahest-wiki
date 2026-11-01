@@ -352,7 +352,8 @@ hr {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 24px;
-    justify-content: space-between;
+    justify-content: center;
+    text-align: center;
 }
 
 .site-footer a {

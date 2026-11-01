@@ -1098,17 +1098,47 @@
         return el("div", { className: "gen-enchant" }, rows);
     }
 
+    function dropTitle(drop, index) {
+        return "Drop " + (index + 1) + (drop.experience === true ? " · experience" : drop.item ? " · " + prettyId(drop.item) : "");
+    }
+
+    function fillDropPreview(node, drop) {
+        node.innerHTML = "";
+        describeDrop(state.kind, drop).forEach(function (line) {
+            node.appendChild(el("p", null, [line]));
+        });
+    }
+
+    /** Updates the previews and titles of the cards after a typed change, which does not rebuild the form. */
+    function refreshPreviews() {
+        var file = state.file;
+        Array.prototype.forEach.call(form.querySelectorAll("[data-drop-preview]"), function (node) {
+            var i = parseInt(node.getAttribute("data-drop-preview"), 10);
+            var drop = Array.isArray(file.drops) ? file.drops[i] : null;
+            if (drop && typeof drop === "object") fillDropPreview(node, drop);
+        });
+        Array.prototype.forEach.call(form.querySelectorAll("[data-drop-title]"), function (node) {
+            var i = parseInt(node.getAttribute("data-drop-title"), 10);
+            var drop = Array.isArray(file.drops) ? file.drops[i] : null;
+            if (drop && typeof drop === "object") node.textContent = dropTitle(drop, i);
+        });
+        Array.prototype.forEach.call(form.querySelectorAll("[data-removal-preview]"), function (node) {
+            var i = parseInt(node.getAttribute("data-removal-preview"), 10);
+            var entry = Array.isArray(file.removals) ? file.removals[i] : undefined;
+            if (entry !== undefined) node.firstChild.textContent = describeRemoval(entry);
+        });
+    }
+
     function renderDrop(drop, index, total) {
         var path = ["file", "drops", index];
         var isMob = state.kind === "mob";
         var isExperience = drop.experience === true;
         var trigger = drop.on || "death";
-        var preview = el("div", { className: "gen-preview" }, describeDrop(state.kind, drop).map(function (line) {
-            return el("p", null, [line]);
-        }));
+        var preview = el("div", { className: "gen-preview", "data-drop-preview": String(index) });
+        fillDropPreview(preview, drop);
 
         var head = el("div", { className: "gen-card__head" }, [
-            el("h4", { className: "gen-card__title" }, ["Drop " + (index + 1) + (isExperience ? " · experience" : drop.item ? " · " + prettyId(drop.item) : "")]),
+            el("h4", { className: "gen-card__title", "data-drop-title": String(index) }, [dropTitle(drop, index)]),
             el("div", { className: "gen-card__tools" }, [
                 index > 0 ? button("↑", "move", { index: String(index), dir: "-1" }, "gen-icon") : null,
                 index < total - 1 ? button("↓", "move", { index: String(index), dir: "1" }, "gen-icon") : null,
@@ -1194,7 +1224,7 @@
                 el("h4", { className: "gen-card__title" }, ["Removal " + (index + 1)]),
                 el("div", { className: "gen-card__tools" }, [button("Remove", "remove-item", { target: pathKey(path) }, "gen-button--quiet")])
             ]),
-            el("div", { className: "gen-preview" }, [el("p", null, [describeRemoval(entry)])]),
+            el("div", { className: "gen-preview", "data-removal-preview": String(index) }, [el("p", null, [describeRemoval(entry)])]),
             el("div", { className: "gen-grid" }, fields)
         ];
         if (isObject) {
@@ -1307,6 +1337,7 @@
     }
 
     function renderOutput() {
+        refreshPreviews();
         var issues = checkFile(state.kind, state.file);
         var errors = issues.filter(function (i) {
             return i.severity === "error";

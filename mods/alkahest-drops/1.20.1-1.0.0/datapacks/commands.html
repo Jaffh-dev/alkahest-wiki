@@ -129,8 +129,6 @@
             </select>
         </label>
         <label>Runs (or ticks) <input type="number" data-field="runs" value="1000" min="1" max="1000000" step="1"></label>
-        <label>Enchantment id <input type="text" data-field="enchant" value="" placeholder="minecraft:looting" spellcheck="false"></label>
-        <label>Level <input type="number" data-field="level" value="3" min="0" max="255" step="1"></label>
         <label>By
             <select data-field="by">
                 <option value="">default</option>
@@ -151,6 +149,11 @@
                 <option value="drop no-text">drop no-text</option>
             </select>
         </label>
+    </div>
+    <div class="tool__group">
+        <p class="tool__subtitle">Enchantments</p>
+        <div class="tool__rows" data-enchant-list></div>
+        <button type="button" class="button button--ghost tool__add" data-add-enchant>Add enchantment</button>
     </div>
     <pre><code data-lang="command" data-simulate-output></code></pre>
     <p class="muted" data-simulate-note aria-live="polite"></p>

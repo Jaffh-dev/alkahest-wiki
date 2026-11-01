@@ -169,8 +169,7 @@
         if (!footer) return;
         footer.appendChild(
             el("div", { className: "site-footer__inner" }, [
-                el("span", null, ["Alkahest Wiki: documentation for the Alkahest family of Minecraft mods."]),
-                el("span", null, ["Not affiliated with Mojang or Microsoft."])
+                el("span", null, ["Alkahest Wiki: documentation for the Alkahest family of Minecraft mods."])
             ])
         );
     }

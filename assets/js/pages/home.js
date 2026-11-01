@@ -51,7 +51,7 @@
     });
     grid.appendChild(
         el("div", { className: "mod-card mod-card--placeholder" }, [
-            el("p", null, ["More Alkahest mods are on the way: Alkahest Fluids and Alkahest UI."])
+            el("p", null, ["More Alkahest mods are on the way :)"])
         ])
     );
 })();
