@@ -1934,7 +1934,7 @@
      * Recipes and start
      * ==================================================================== */
 
-    var recipeSelect = root.querySelector("[data-gen-recipe]");
+    var recipeSelect = document.querySelector("[data-gen-recipe]");
     if (recipeSelect) {
         Object.keys(RECIPES).forEach(function (key) {
             recipeSelect.appendChild(el("option", { value: key }, [RECIPES[key].label]));
