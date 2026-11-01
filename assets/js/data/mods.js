@@ -23,11 +23,18 @@
                 "lands. Checked on load, simulated in game, shown in JEI.",
             icon: "assets/img/mods/alkahest-drops.svg",
             path: "mods/alkahest-drops/",
-            status: "In development",
+            status: "Released",
             loader: "Forge",
             minecraft: ["1.20.1"],
             tags: ["Library", "Datapacks", "Server side"],
             repository: "https://github.com/Jaffh-dev/alkahest-drops",
+            links: [
+                { label: "Modrinth", url: "https://modrinth.com/mod/alkahest-drops", primary: true },
+                { label: "CurseForge", url: "https://www.curseforge.com/minecraft/mc-mods/alkahest-drops" },
+                { label: "Source code", url: "https://github.com/Jaffh-dev/alkahest-drops" },
+                { label: "Report an issue", url: "https://github.com/Jaffh-dev/alkahest-drops/issues" },
+                { label: "Changelog", url: "https://github.com/Jaffh-dev/alkahest-drops/blob/main/CHANGELOG.md" }
+            ],
             sections: [
                 {
                     id: "datapacks",
@@ -49,10 +56,10 @@
                     minecraft: "1.20.1",
                     loader: "Forge 47.4+",
                     api: "1.0.0",
-                    status: "Unreleased",
+                    status: "Released",
                     latest: true,
                     highlights: [
-                        "First release: drop files and removal files, format version 1",
+                        "First release: drop files and removal files, file format 1",
                         "Triggers beyond death: shear, hit, lightning, periodic",
                         "Bad-luck protection, one-time and per-player drops",
                         "on_drop actions: glow and datapack functions",

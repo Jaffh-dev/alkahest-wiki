@@ -35,6 +35,13 @@
     font-size: 1.1rem;
 }
 
+.mod-hero__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
 .mod-hero__version .version-select select {
     font-size: 1rem;
     padding: 8px 34px 8px 12px;

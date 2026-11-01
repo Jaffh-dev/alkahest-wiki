@@ -21,13 +21,16 @@ assets/
   css/home.css                     Home page
   css/mod.css                      Mod landing pages
   css/docs.css                     Doc pages: sidebar, content, "On this page", previous / next
+  css/generator.css                Drop file generator page
   js/core/theme.js                 Light / dark theme (loaded in <head> so the page never flashes)
   js/core/site.js                  Header, footer, code highlighting and copy buttons (every page)
   js/core/versions.js              Version selector (mod landing and doc pages)
   js/core/docs.js                  Sidebar, table of contents, previous / next, mobile menu (doc pages)
-  js/data/mods.js                  Registry of mods and their versions
+  js/data/mods.js                  Registry of mods, their links and versions
+  js/data/minecraft-1.20.1-ids.js  Vanilla 1.20.1 ids for the generator's autocomplete
   js/pages/*.js                    One entry script per page; doc pages without their own behavior share doc-page.js
   img/                             Site logo and mod icons
+schemas/alkahest-drops/v1/         JSON Schemas of Alkahest Drops file format 1 (mob_drops, block_drops, common)
 mods/<mod-id>/
   index.html                       Mod landing page
   <version>/nav.js                 Page list of that version (sidebar order)
@@ -56,6 +59,25 @@ Each page describes itself with attributes on `<html>`, which the scripts read:
 
 Code blocks: `<pre data-title="optional label"><code data-lang="json">…</code></pre>`. Languages: `json`, `java`,
 `gradle`, `toml`, `mcfunction`, `command`. Escape `<`, `>` and `&` inside code as `&lt;`, `&gt;`, `&amp;`.
+
+## JSON Schemas
+
+`schemas/alkahest-drops/v1/` holds the schemas editors use for autocomplete. Their `$id` is the published address,
+`https://jaffh-dev.github.io/alkahest-wiki/schemas/alkahest-drops/v1/...`: change it in all three files if the
+repository or GitHub user name changes. `v1` is the file format version, not the mod version; a new format gets a new
+folder and the old one stays.
+
+## Vanilla id list
+
+`assets/js/data/minecraft-1.20.1-ids.js` comes from Minecraft's own data generator, run in an empty folder:
+
+```
+java -DbundlerMainClass=net.minecraft.data.Main -jar server.jar --reports --server --output generated
+```
+
+`generated/reports/registries.json` gives items, blocks, entity types, enchantments and loot condition and function
+types; `generated/data/minecraft/tags/` gives the tags. Mobs are the entity types with a spawn egg, plus player, wither,
+ender_dragon, iron_golem, snow_golem, illusioner and giant. Ids are stored without the `minecraft:` prefix.
 
 ## Adding a version of a mod
 

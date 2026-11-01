@@ -6,7 +6,11 @@ window.Alkahest.registerNav("alkahest-drops", "1.20.1-1.0.0", {
     datapacks: [
         {
             title: "Start here",
-            pages: [{ id: "index", title: "Getting started", keywords: "pack.mcmeta folder first file reload" }]
+            pages: [
+                { id: "index", title: "Getting started", keywords: "pack.mcmeta folder first file reload download" },
+                { id: "generator", title: "Drop file generator", keywords: "form builder tool zip export share import" },
+                { id: "editor-support", title: "Editor autocomplete", keywords: "json schema vscode intellij" }
+            ]
         },
         {
             title: "Writing files",

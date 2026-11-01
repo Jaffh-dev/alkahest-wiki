@@ -184,9 +184,11 @@
 
 <h2>Editor autocomplete</h2>
 <p>
-    Unknown keys are ignored, so a <code>"$schema"</code> key for editor autocomplete is allowed. A JSON Schema for
-    the format is planned.
+    The game ignores unknown keys, so a <code>"$schema"</code> key is allowed. Point it at the published JSON Schema and
+    your editor suggests keys, explains them on hover and underlines mistakes. See
+    <a href="editor-support.html">Editor autocomplete</a>.
 </p>
+<pre><code data-lang="json">"$schema": "https://jaffh-dev.github.io/alkahest-wiki/schemas/alkahest-drops/v1/mob_drops.schema.json"</code></pre>
             </article>
             <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
         </main>

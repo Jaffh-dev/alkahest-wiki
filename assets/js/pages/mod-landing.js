@@ -55,6 +55,13 @@
         updateLinks(version);
     }
 
+    var linkHost = document.querySelector("[data-mod-links]");
+    if (linkHost && mod.links) {
+        mod.links.forEach(function (link) {
+            linkHost.appendChild(el("a", { className: "button" + (link.primary ? "" : " button--ghost"), href: link.url }, [link.label]));
+        });
+    }
+
     var current = versionFromUrl();
     var picker = document.querySelector("[data-version-picker]");
     if (picker) {

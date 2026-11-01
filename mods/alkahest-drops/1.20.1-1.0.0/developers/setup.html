@@ -35,14 +35,33 @@
     touches it in one class that only loads when the mod is present.
 </p>
 
-<div class="callout callout--warn">
-    <span class="callout__title">Maven repository coming</span>
-    <p>Alkahest Drops is not on a Maven repository yet. Until it is, use the mod jar from a local <code>libs</code>
-        folder as shown below. This page will show the one-line Maven dependency once it is published.</p>
-</div>
-
 <h2>Gradle (ForgeGradle 6)</h2>
-<p>Copy <code>alkahestdrops-1.20.1-1.0.0.jar</code> into a <code>libs</code> folder next to <code>build.gradle</code>.</p>
+<p>Alkahest Drops is on the Modrinth Maven. Add the repository and the dependency:</p>
+<pre data-title="build.gradle"><code data-lang="gradle">repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    // Compile against the API without making it required.
+    compileOnly fg.deobf("maven.modrinth:alkahest-drops:1.20.1-1.0.0")
+    // Also load it in your dev runs, to test the integration.
+    runtimeOnly fg.deobf("maven.modrinth:alkahest-drops:1.20.1-1.0.0")
+}</code></pre>
+<p><code>fg.deobf</code> remaps the jar to your development mappings. Change the version to match the release you
+    target; all 1.x versions keep the API compatible.</p>
+
+<h3>Without the Maven</h3>
+<p>To build against a jar you downloaded, put it in a <code>libs</code> folder next to <code>build.gradle</code>:</p>
 <pre data-title="build.gradle"><code data-lang="gradle">repositories {
     flatDir {
         dir 'libs'
@@ -50,9 +69,7 @@
 }
 
 dependencies {
-    // Compile against the API without making it required.
     compileOnly fg.deobf("blank:alkahestdrops:1.20.1-1.0.0")
-    // Also load it in your dev runs, to test the integration.
     runtimeOnly fg.deobf("blank:alkahestdrops:1.20.1-1.0.0")
 }</code></pre>
 <p>With a flat directory the group is ignored: <code>alkahestdrops:1.20.1-1.0.0</code> resolves to
