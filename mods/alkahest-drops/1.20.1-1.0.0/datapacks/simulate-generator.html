@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="simulate-generator">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Simulate command generator · Alkahest Drops</title>
+    <meta name="description" content="Build /alkdrops simulate commands with a form: target, trigger, runs, any number of forced enchantments, actor and filters, in the order the command needs.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/simulate-generator.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Simulate command generator</h1>
+<p class="docs-lead">
+    <code>/alkdrops simulate</code> rolls drops many times without killing or breaking anything. Its options must come in
+    a fixed order; fill in the form and copy the command instead.
+</p>
+
+<div class="tool" data-simulate-tool>
+        <div class="tool__fields">
+        <label>Target kind
+            <select data-field="kind">
+                <option value="entity">Mob (entity)</option>
+                <option value="block">Block</option>
+            </select>
+        </label>
+        <label>Id <input type="text" data-field="target" value="minecraft:zombie" spellcheck="false"></label>
+        <label data-only="entity">Trigger
+            <select data-field="trigger">
+                <option value="">death (default)</option>
+                <option value="shear">shear</option>
+                <option value="hit">hit</option>
+                <option value="lightning">lightning</option>
+                <option value="periodic">periodic</option>
+            </select>
+        </label>
+        <label>Runs (or ticks) <input type="number" data-field="runs" value="1000" min="1" max="1000000" step="1"></label>
+        <label>By
+            <select data-field="by">
+                <option value="">default</option>
+                <option value="player">player</option>
+                <option value="none">none</option>
+                <option value="explosion" data-only="block">explosion</option>
+                <option value="killer" data-only="entity">a mob (killer)</option>
+            </select>
+        </label>
+        <label data-only-by="killer">Killer id <input type="text" data-field="killer" value="minecraft:wolf" spellcheck="false"></label>
+        <label>Only <input type="text" data-field="only" value="" placeholder="experience or an item id" spellcheck="false"></label>
+        <label>Sneaking <select data-field="sneaking"><option value="">no</option><option value="yes">yes</option></select></label>
+        <label data-only="entity">Burning <select data-field="burning"><option value="">no</option><option value="yes">yes</option></select></label>
+        <label>Drop items
+            <select data-field="drop">
+                <option value="">no</option>
+                <option value="drop">drop</option>
+                <option value="drop no-text">drop no-text</option>
+            </select>
+        </label>
+    </div>
+    <div class="tool__group">
+        <p class="tool__subtitle">Enchantments</p>
+        <div class="tool__rows" data-enchant-list></div>
+        <button type="button" class="button button--ghost tool__add" data-add-enchant>Add enchantment</button>
+    </div>
+    <pre><code data-lang="command" data-simulate-output></code></pre>
+    <p class="muted" data-simulate-note aria-live="polite"></p>
+</div>
+
+<h2>Using the result</h2>
+<ol class="steps">
+    <li>Copy the command (hover the box and press <strong>Copy</strong>) and paste it in chat, as an operator or with
+        cheats on.</li>
+    <li>The report shows each item's total, its average per run and the percent of runs it dropped in. Pity and
+        one-time drops have their own lines.</li>
+    <li>Long reports have pages: <code>/alkdrops simulate page &lt;n&gt;</code> shows another page without rolling again.</li>
+</ol>
+
+<h2>Notes</h2>
+<ul>
+    <li>Simulations use their own fake player, so they never touch your real pity or first-drop progress.</li>
+    <li>With <code>on periodic</code> the number is ticks (20 per second), and rates are shown per minute.</li>
+    <li>Each simulated hit deals 1 damage, so <code>damage_taken</code> drops read "per damage".</li>
+    <li>Enchantments replace those levels on the held item (on the tool for blocks); level 0 removes one.</li>
+</ul>
+<p>Every option is explained on the <a href="commands.html#simulate">Commands</a> page.</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

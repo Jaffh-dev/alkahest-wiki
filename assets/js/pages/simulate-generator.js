@@ -1,5 +1,5 @@
 /*
- * Commands page: builds an /alkdrops simulate command from a form, keeping the option order the command requires
+ * Simulate command generator page: builds an /alkdrops simulate command from a form, keeping the option order the command requires
  * and refusing the combinations the command refuses.
  */
 (function () {

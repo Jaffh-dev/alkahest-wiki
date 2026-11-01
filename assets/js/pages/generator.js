@@ -1391,6 +1391,11 @@
             simBlock.appendChild(el("div", { className: "gen-command" }, [c, button("Copy", "copy-text", { text: command }, "gen-chip")]));
         });
         if (sim.note) simBlock.appendChild(el("p", { className: "gen-help" }, [sim.note]));
+        simBlock.appendChild(el("p", { className: "gen-help" }, [
+            "More options (enchantments, killer, sneaking): ",
+            el("a", { href: "simulate-generator.html" }, ["simulate command generator"]),
+            "."
+        ]));
 
         output.appendChild(el("div", { className: "gen-output__head" }, [
             el("p", { className: "gen-output__label" }, ["Output"]),
