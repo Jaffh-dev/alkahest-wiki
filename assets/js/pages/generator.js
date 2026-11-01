@@ -1939,19 +1939,54 @@
         Object.keys(RECIPES).forEach(function (key) {
             recipeSelect.appendChild(el("option", { value: key }, [RECIPES[key].label]));
         });
-        recipeSelect.addEventListener("change", function () {
-            var recipe = RECIPES[recipeSelect.value];
-            if (!recipe) return;
-            if (!window.confirm("Replace the current file with \"" + recipe.label + "\"?")) {
-                recipeSelect.value = "";
-                return;
-            }
+        var confirmDialog = document.querySelector("[data-gen-confirm]");
+        var pendingRecipe = null;
+
+        var applyRecipe = function (recipe) {
             state = recipe.make();
             rawText = {};
             rawErrors = {};
-            recipeSelect.value = "";
             render();
+        };
+        var closeConfirm = function () {
+            pendingRecipe = null;
+            recipeSelect.value = "";
+            if (confirmDialog.open) {
+                if (confirmDialog.close) confirmDialog.close();
+                else confirmDialog.removeAttribute("open");
+            }
+            recipeSelect.focus();
+        };
+
+        recipeSelect.addEventListener("change", function () {
+            var recipe = RECIPES[recipeSelect.value];
+            if (!recipe) return;
+            if (!confirmDialog) {
+                applyRecipe(recipe);
+                recipeSelect.value = "";
+                return;
+            }
+            pendingRecipe = recipe;
+            confirmDialog.querySelector("[data-confirm-text]").textContent =
+                "Your current file will be replaced by “" + recipe.label + "”.";
+            if (confirmDialog.showModal) confirmDialog.showModal();
+            else confirmDialog.setAttribute("open", "");
+            confirmDialog.querySelector("[data-confirm-yes]").focus();
         });
+
+        if (confirmDialog) {
+            confirmDialog.querySelector("[data-confirm-yes]").addEventListener("click", function () {
+                var recipe = pendingRecipe;
+                closeConfirm();
+                if (recipe) applyRecipe(recipe);
+            });
+            confirmDialog.querySelector("[data-confirm-no]").addEventListener("click", closeConfirm);
+            /* Escape closes a modal dialog by itself; keep the select in sync. */
+            confirmDialog.addEventListener("close", function () {
+                pendingRecipe = null;
+                recipeSelect.value = "";
+            });
+        }
     }
 
     buildDatalists();

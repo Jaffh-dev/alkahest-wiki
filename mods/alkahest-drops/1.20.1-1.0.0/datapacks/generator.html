@@ -75,6 +75,16 @@
             <button type="button" class="gen-button gen-button--quiet" data-import-cancel>Cancel</button>
         </div>
     </dialog>
+
+    <dialog class="gen-dialog gen-dialog--small" data-gen-confirm aria-labelledby="gen-confirm-title">
+        <h2 id="gen-confirm-title">Start from this recipe?</h2>
+        <p data-confirm-text></p>
+        <p class="gen-help">Tip: copy the share link first if you want to come back to your current file.</p>
+        <div class="gen-dialog__row">
+            <button type="button" class="gen-button" data-confirm-yes>Replace my file</button>
+            <button type="button" class="gen-button gen-button--quiet" data-confirm-no>Keep my file</button>
+        </div>
+    </dialog>
 </div>
             </article>
             <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
