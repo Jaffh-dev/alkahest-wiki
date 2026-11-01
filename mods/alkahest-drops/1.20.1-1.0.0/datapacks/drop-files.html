@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="drop-files">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drop files · Alkahest Drops</title>
+    <meta name="description" content="Reference of every key of an Alkahest Drops drop file: file keys and drop keys, with their types, ranges and rules.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Drop files</h1>
+<p class="docs-lead">
+    A drop file adds drops to a mob (<code>mob_drops/</code>) or a block (<code>block_drops/</code>). This page lists
+    every key. Most keys are required on purpose: a file always says exactly what it does.
+</p>
+
+<h2>A complete example</h2>
+<p>A zombie drop that uses most keys. You will rarely need all of them at once.</p>
+<pre data-title="data/mypack/mob_drops/zombie_ruby.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "conditions": [
+    { "condition": "minecraft:killed_by_player" }
+  ],
+  "drops": [
+    {
+      "item": "minecraft:emerald",
+      "chance": 0.05,
+      "count": { "min": 1, "max": 3 },
+      "nbt": "{display:{Name:'\"Ruby\"'}}",
+      "drop_behavior": { "type": "fixed_rolls", "rolls": 3, "chance_per_roll": 0.5, "increment_value": 1 },
+      "enchant_bonus": [
+        { "enchant": "minecraft:looting",
+          "on_enchant": { "bonus_chance": { "bonus_chance_per_level": 0.01, "max_bonus_chance": 0.05 } } }
+      ],
+      "conditions": [
+        { "condition": "minecraft:entity_properties", "entity": "this",
+          "predicate": { "flags": { "is_on_fire": true } } }
+      ],
+      "functions": [
+        { "function": "minecraft:enchant_randomly" }
+      ],
+      "id": "ruby",
+      "pity": 50,
+      "on_drop": { "glow": true }
+    }
+  ]
+}</code></pre>
+
+<h2>File keys</h2>
+<div class="key-list">
+    <div class="key">
+        <div class="key__head"><span class="key__name">version</span><span class="key__type">integer</span><span class="required">Required</span></div>
+        <p>File format version. Use <code>1</code>. A missing or newer version skips the file.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">entity</span> / <span class="key__name">block</span><span class="key__type">string</span><span class="required">Required</span></div>
+        <p><code>entity</code> in <code>mob_drops/</code>, <code>block</code> in <code>block_drops/</code>. A mob or
+            block id, a <code>#tag</code>, <code>mod:*</code> (everything of a namespace) or <code>*</code>
+            (everything). See <a href="targets-and-conditions.html">Targets and conditions</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">conditions</span><span class="key__type">array of loot conditions</span><span class="optional">Optional</span></div>
+        <p><strong>Global</strong> conditions: vanilla loot conditions that gate every drop of the file. When one
+            fails, the whole file is skipped for that kill or break.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">drops</span><span class="key__type">array of drops</span><span class="required">Required</span></div>
+        <p>The drops to add. A file with <code>drops</code> must not also have <code>removals</code>: drop files and
+            removal files are never mixed.</p>
+    </div>
+</div>
+
+<h2>Drop keys</h2>
+<p>Keys of each object inside <code>drops</code>.</p>
+<div class="key-list">
+    <div class="key">
+        <div class="key__head"><span class="key__name">item</span><span class="key__type">item id</span><span class="required">Required</span></div>
+        <p>The item to drop, such as <code>minecraft:diamond</code>. An item of a mod that is not installed skips the
+            drop with a warning, so packs can support optional mods. For an experience drop write
+            <code>"experience": true</code> instead (see <a href="experience.html">Experience drops</a>).</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">chance</span><span class="key__type">number, 0 to 1</span><span class="required">Required</span></div>
+        <p>Chance that the drop happens at all: <code>0.05</code> is 5%. Above 1 is clamped to 1 with a warning;
+            below 0 is an error. A chance of <code>0</code> is only allowed when an
+            <a href="enchant-bonus.html">enchantment bonus</a> raises it ("drops only with Looting").</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">count</span><span class="key__type">{ "min": int, "max": int }</span><span class="required">Required</span></div>
+        <p>How many items drop when the chance succeeds. Both keys are required. <code>min</code> goes from 0 to
+            <code>max</code>; <code>max</code> up to the server limit <code>max_count</code> (1024 by default).
+            <code>min</code> greater than <code>max</code> is an error. What happens inside the range depends on
+            <code>drop_behavior</code>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">drop_behavior</span><span class="key__type">object</span><span class="required">Required</span></div>
+        <p>How the count is chosen: <code>uniform</code>, <code>fixed_rolls</code>, <code>chained_rolls</code>,
+            <code>max_health</code> (mobs), <code>hardness</code> (blocks) or <code>damage_taken</code> (hit drops).
+            See <a href="behaviors.html">Drop behaviors</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">nbt</span><span class="key__type">SNBT string</span><span class="optional">Optional</span></div>
+        <p>Item NBT in the same text format as <code>/give</code>, such as
+            <code>"{display:{Name:'\"Ruby\"'}}"</code>. See <a href="functions-and-nbt.html">Loot functions and NBT</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">enchant_bonus</span><span class="key__type">array</span><span class="optional">Optional</span></div>
+        <p>Bonuses from enchantments of the held item (Looting, Fortune or any other). See
+            <a href="enchant-bonus.html">Enchantment bonuses</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">conditions</span><span class="key__type">array of loot conditions</span><span class="optional">Optional</span></div>
+        <p><strong>Local</strong> conditions for this drop only. They add to the file's global conditions: the drop
+            happens only when both pass.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">functions</span><span class="key__type">array of loot functions</span><span class="optional">Optional</span></div>
+        <p>Vanilla (or modded) loot functions applied to the dropped stack, in order.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">pity</span><span class="key__type">integer ≥ 1</span><span class="optional">Optional</span></div>
+        <p>Bad-luck protection: after this many misses in a row, the next roll is forced. See
+            <a href="progress.html">Pity, first drops, per player</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">first_kill</span> / <span class="key__name">first_break</span><span class="key__type">boolean</span><span class="optional">Optional</span></div>
+        <p>Drop once per player, ignoring the chance. <code>first_kill</code> in mob files,
+            <code>first_break</code> in block files.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">per_player</span><span class="key__type">boolean</span><span class="optional">Optional · mobs</span></div>
+        <p>Every player who damaged the mob gets their own roll, locked to them.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">id</span><span class="key__type">string, [a-z0-9_./-]</span><span class="optional">Optional</span></div>
+        <p>A stable name for the drop's progress (pity, first drop), unique in the file. Without it, progress is
+            keyed by the drop's position in the list, so adding a drop above it resets it.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">on</span><span class="key__type">string</span><span class="optional">Optional · mobs</span></div>
+        <p>What makes the drop happen: <code>death</code> (default), <code>shear</code>, <code>hit</code>,
+            <code>lightning</code> or <code>periodic</code>, with <code>interval</code> or <code>cooldown</code>.
+            See <a href="triggers.html">Triggers</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">on_drop</span><span class="key__type">{ "glow", "run_function" }</span><span class="optional">Optional</span></div>
+        <p>Actions when the item lands: make it glow, run a datapack function. See
+            <a href="on-drop.html">Drop actions</a>.</p>
+    </div>
+</div>
+
+<h2>How a drop is rolled</h2>
+<ol>
+    <li>The file's global <code>conditions</code> are tested once. If one fails, no drop of the file happens.</li>
+    <li>For each drop, its local <code>conditions</code> are tested.</li>
+    <li>The <code>chance</code> (plus enchantment bonuses) is rolled.</li>
+    <li>On success, the count is rolled with <code>drop_behavior</code> inside <code>count</code>.</li>
+    <li>The stack is created with <code>nbt</code>, then each of <code>functions</code> runs on it.</li>
+    <li>The item spawns; <code>on_drop</code> runs at the end of that tick.</li>
+</ol>
+<p>Pity and first drops change step 3: see <a href="progress.html">their page</a>.</p>
+
+<h2>Editor autocomplete</h2>
+<p>
+    Unknown keys are ignored, so a <code>"$schema"</code> key for editor autocomplete is allowed. A JSON Schema for
+    the format is planned.
+</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

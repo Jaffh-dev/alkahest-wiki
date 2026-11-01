@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="enchant-bonus">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enchantment bonuses · Alkahest Drops</title>
+    <meta name="description" content="Raise a drop's chance, count or rolls with Looting, Fortune or any other enchantment using enchant_bonus.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Enchantment bonuses</h1>
+<p class="docs-lead">
+    <code>enchant_bonus</code> makes a drop better with an enchantment on the held item: Looting, Fortune, or any
+    other enchantment, modded ones included. Each enchantment can raise the chance, the count and the rolls.
+</p>
+
+<h2>Example</h2>
+<pre data-title="data/mypack/mob_drops/zombie_diamond.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "drops": [
+    {
+      "item": "minecraft:diamond",
+      "chance": 0.02,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "enchant_bonus": [
+        { "enchant": "minecraft:looting",
+          "on_enchant": {
+            "bonus_chance": { "bonus_chance_per_level": 0.01, "max_bonus_chance": 0.03 }
+          } },
+        { "enchant": "minecraft:sharpness",
+          "on_enchant": {
+            "bonus_count": { "bonus_max_per_level": 1, "max_bonus_max": 2 }
+          } }
+      ]
+    }
+  ]
+}</code></pre>
+<p>With Looting III and Sharpness V: chance 2% + 3% = 5%, and the count range becomes 1 to 3 (max raised by 1 per
+    Sharpness level, capped at +2).</p>
+
+<h2>Where the level comes from</h2>
+<p>Always from the item in the player's (or killer's) hand when the drop happens:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Drop</th><th>Item read</th></tr></thead>
+    <tbody>
+        <tr><td>Mob death</td><td>The killer's main-hand weapon. Looting also follows other mods that change the Looting level.</td></tr>
+        <tr><td><code>"on": "hit"</code></td><td>The player's main-hand weapon.</td></tr>
+        <tr><td><code>"on": "shear"</code></td><td>The shears.</td></tr>
+        <tr><td>Block break</td><td>The tool.</td></tr>
+        <tr><td><code>lightning</code>, <code>periodic</code></td><td>Nothing: no bonus (a warning if the file has one).</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>Entry keys</h2>
+<div class="key-list">
+    <div class="key">
+        <div class="key__head"><span class="key__name">enchant</span><span class="key__type">enchantment id</span><span class="required">Required</span></div>
+        <p>Such as <code>minecraft:looting</code>. An enchantment of a mod that is not installed skips only that entry,
+            with a warning. The same enchantment twice in one drop is an error.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">on_enchant</span><span class="key__type">object</span><span class="required">Required</span></div>
+        <p>One or more of <code>bonus_chance</code>, <code>bonus_roll</code>, <code>bonus_count</code>. Empty is an error.</p>
+    </div>
+</div>
+
+<h2>How bonuses are computed</h2>
+<p>For each key: <strong>bonus = per-level value × enchantment level</strong>, then capped by its <code>max_*</code> key.
+    The cap limits the <em>bonus</em>, not the total. Bonuses of several enchantments add up; a chance never goes above 1.</p>
+<p>A <code>max_*</code> key is optional, but needs its per-level key. Missing, it means "no cap" (up to the server limit).</p>
+
+<h3>bonus_chance</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Key</th><th>Range</th></tr></thead>
+    <tbody>
+        <tr><td><code>bonus_chance_per_level</code></td><td>above 0, up to 1</td></tr>
+        <tr><td><code>max_bonus_chance</code></td><td><code>bonus_chance_per_level</code> to 1</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>bonus_count</h3>
+<p>Raises <code>count.min</code> and/or <code>count.max</code>. At least one per-level key.</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Key</th><th>Range</th></tr></thead>
+    <tbody>
+        <tr><td><code>bonus_min_per_level</code>, <code>bonus_max_per_level</code></td><td>0 to <code>max_count</code></td></tr>
+        <tr><td><code>max_bonus_min</code>, <code>max_bonus_max</code></td><td>per-level value to <code>max_count</code></td></tr>
+    </tbody>
+</table>
+</div>
+<p>For <code>max_health</code>, <code>hardness</code> and <code>damage_taken</code> it raises the clamp bounds.</p>
+
+<h3>bonus_roll</h3>
+<p>Only for <code>fixed_rolls</code> and <code>chained_rolls</code> (a warning elsewhere). At least one per-level key.</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Key</th><th>Adds to</th><th>Range</th></tr></thead>
+    <tbody>
+        <tr><td><code>bonus_rolls_per_level</code></td><td><code>rolls</code></td><td>1 to <code>max_rolls</code></td></tr>
+        <tr><td><code>max_bonus_rolls</code></td><td></td><td>per-level value to <code>max_rolls</code></td></tr>
+        <tr><td><code>bonus_roll_chance_per_level</code></td><td><code>chance_per_roll</code></td><td>above 0, up to 1</td></tr>
+        <tr><td><code>max_bonus_roll_chance</code></td><td></td><td>per-level value to 1</td></tr>
+        <tr><td><code>bonus_increment_per_level</code></td><td><code>increment_value</code></td><td>1 to <code>max_increment</code></td></tr>
+        <tr><td><code>max_bonus_increment</code></td><td></td><td>per-level value to <code>max_increment</code></td></tr>
+    </tbody>
+</table>
+</div>
+<p>Out-of-range values are clamped with a warning; a per-level value of 0 or less is an error.</p>
+
+<h2>Drops that need the enchantment</h2>
+<p>Some values are allowed at 0 only when a bonus raises them, so the drop happens only with the enchantment:</p>
+<ul>
+    <li><code>"chance": 0</code> needs a <code>bonus_chance</code> in some entry.</li>
+    <li><code>count</code> 0 to 0 needs bonuses that raise both min and max (they may come from different enchantments).</li>
+    <li><code>rolls</code>, <code>chance_per_roll</code> or <code>increment_value</code> at 0 need the matching <code>bonus_roll</code> key.</li>
+</ul>
+<pre data-title="Only drops with Looting"><code data-lang="json">{
+  "item": "minecraft:nether_star",
+  "chance": 0,
+  "count": { "min": 1, "max": 1 },
+  "drop_behavior": { "type": "uniform" },
+  "enchant_bonus": [
+    { "enchant": "minecraft:looting",
+      "on_enchant": { "bonus_chance": { "bonus_chance_per_level": 0.001 } } }
+  ]
+}</code></pre>
+
+<div class="callout callout--warn">
+    <span class="callout__title">Bonuses that stack with loot functions</span>
+    <p>If <code>functions</code> has <code>minecraft:looting_enchant</code> or <code>minecraft:apply_bonus</code> for the
+        same enchantment as an <code>enchant_bonus</code> entry, both apply. Alkahest Drops warns about it.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

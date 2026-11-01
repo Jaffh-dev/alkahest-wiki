@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="triggers">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Triggers · Alkahest Drops</title>
+    <meta name="description" content="Make mobs drop on shear, hit, lightning or over time with the on key, interval and cooldown.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Triggers</h1>
+<p class="docs-lead">
+    By default a mob drop happens when the mob dies. The <code>on</code> key makes it happen on other events: when a
+    player shears or hits the mob, when lightning strikes it, or every so often while it lives. Mob files only.
+</p>
+
+<div class="table-wrap">
+<table>
+    <thead><tr><th><code>on</code></th><th>Happens when</th><th>Player</th><th>Extra key</th></tr></thead>
+    <tbody>
+        <tr><td><code>death</code></td><td>The mob dies (default).</td><td>The killer, if any</td><td></td></tr>
+        <tr><td><code>shear</code></td><td>A player shears it with shears.</td><td>Yes</td><td></td></tr>
+        <tr><td><code>hit</code></td><td>A player deals damage to it.</td><td>Yes</td><td><code>cooldown</code> (ticks, default 0)</td></tr>
+        <tr><td><code>lightning</code></td><td>Lightning strikes it.</td><td>No</td><td></td></tr>
+        <tr><td><code>periodic</code></td><td>Time passes while it is alive.</td><td>No</td><td><code>interval</code> (ticks, default 6000)</td></tr>
+    </tbody>
+</table>
+</div>
+<p>20 ticks are one second; 6000 ticks are 5 minutes.</p>
+
+<h2>Examples</h2>
+<pre data-title="data/mypack/mob_drops/sheep_shear.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:sheep",
+  "drops": [
+    {
+      "item": "minecraft:string",
+      "chance": 0.5,
+      "count": { "min": 1, "max": 2 },
+      "drop_behavior": { "type": "uniform" },
+      "on": "shear"
+    }
+  ]
+}</code></pre>
+<pre data-title="data/mypack/mob_drops/pig_hit.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:pig",
+  "drops": [
+    {
+      "item": "minecraft:carrot",
+      "chance": 1,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "on": "hit",
+      "cooldown": 40
+    }
+  ]
+}</code></pre>
+<pre data-title="data/mypack/mob_drops/chicken_periodic.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:chicken",
+  "drops": [
+    {
+      "item": "minecraft:gold_nugget",
+      "chance": 1,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "on": "periodic",
+      "interval": 1200
+    }
+  ]
+}</code></pre>
+
+<h2>Timing</h2>
+<ul>
+    <li><strong>periodic</strong>: the first drop comes one <code>interval</code> after the timer starts, then every
+        <code>interval</code>.</li>
+    <li><strong>hit</strong>: the first hit can drop, then the drop waits <code>cooldown</code> ticks.</li>
+    <li>The timer restarts on every attempt, whether the chance succeeded or not.</li>
+    <li>Timers are saved with the mob and survive unloading and portals.</li>
+    <li><code>interval</code> must be at least 1, <code>cooldown</code> at least 0. The key of the other trigger is
+        ignored with a warning.</li>
+</ul>
+
+<h2>What each trigger allows</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Feature</th><th>death</th><th>shear</th><th>hit</th><th>lightning</th><th>periodic</th></tr></thead>
+    <tbody>
+        <tr><td><code>enchant_bonus</code></td><td>weapon</td><td>shears</td><td>weapon</td><td>warning</td><td>warning</td></tr>
+        <tr><td><code>pity</code></td><td>yes</td><td>yes</td><td>yes</td><td>warning</td><td>warning</td></tr>
+        <tr><td><code>first_kill</code></td><td>yes</td><td>yes</td><td>yes</td><td>error</td><td>error</td></tr>
+        <tr><td><code>per_player</code></td><td>yes</td><td>warning</td><td>warning</td><td>warning</td><td>warning</td></tr>
+        <tr><td><code>damage_taken</code></td><td>error</td><td>error</td><td>yes</td><td>error</td><td>error</td></tr>
+    </tbody>
+</table>
+</div>
+<p>"Warning" means the key is ignored and the drop still loads; "error" skips the drop.</p>
+
+<h2>Details per trigger</h2>
+<dl>
+    <dt>shear</dt>
+    <dd>Any mob that can be sheared right now (sheep with wool, snow golems, mooshrooms, modded shearable mobs).
+        Dispensers shear without a player, so they never trigger it.</dd>
+    <dt>hit</dt>
+    <dd>Needs real damage after armor, Resistance and absorption: a hit fully blocked by Resistance V does not drop.
+        Fake players of machines count as players here.</dd>
+    <dt>lightning</dt>
+    <dd>Once per bolt, even though a bolt lasts several ticks. The bolt that made the drop does not destroy it (fire
+        on the ground can still burn it, as with any item).</dd>
+    <dt>periodic</dt>
+    <dd>Only living mobs in loaded chunks.</dd>
+</dl>
+<p>Drops of other triggers spawn at the mob, and experience drops spawn experience orbs there.</p>
+
+<h2>Loot conditions on triggers</h2>
+<p>Drops of other triggers use the death loot context with a stand-in damage source: the player's attack for shear and
+    hit (so <code>killed_by_player</code> passes for that player), lightning for lightning, generic damage for periodic.</p>
+
+<h2>Removal files and triggers</h2>
+<p>A removal file has an optional top-level <code>on</code> (default <code>death</code>) and only removes drops of that
+    trigger. On non-death triggers it removes only Alkahest Drops drops of other namespaces; the game's own drops
+    (sheep wool, chicken eggs) are never touched. A top-level <code>on</code> in a drop file is ignored with a warning:
+    set it per drop.</p>
+
+<h2>Testing triggers</h2>
+<pre><code data-lang="command">/alkdrops simulate entity minecraft:sheep on shear 100
+/alkdrops simulate entity minecraft:pig on hit 50
+/alkdrops simulate entity minecraft:chicken on periodic 24000</code></pre>
+<p>With <code>on periodic</code> the number is ticks, and rates are shown per minute. Each simulated hit deals 1 damage.</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

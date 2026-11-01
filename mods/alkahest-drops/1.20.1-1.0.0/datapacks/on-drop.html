@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="on-drop">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drop actions · Alkahest Drops</title>
+    <meta name="description" content="Make an Alkahest Drops drop glow or run a datapack function when it lands, with ready-made function recipes.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Drop actions</h1>
+<p class="docs-lead">
+    <code>on_drop</code> does something when a drop lands: make the item glow through walls, or run a datapack
+    function at the item. Functions can play sounds, show particles, announce the drop, reward or punish players.
+</p>
+
+<h2>Keys</h2>
+<pre><code data-lang="json">"on_drop": { "glow": true, "run_function": "mypack:legendary_drop" }</code></pre>
+<div class="key-list">
+    <div class="key">
+        <div class="key__head"><span class="key__name">glow</span><span class="key__type">boolean</span><span class="optional">Optional</span></div>
+        <p>The item gets the glowing outline, visible through walls. Saved with the item.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">run_function</span><span class="key__type">function id</span><span class="optional">Optional</span></div>
+        <p>A datapack function, such as <code>mypack:legendary_drop</code> for
+            <code>data/mypack/functions/legendary_drop.mcfunction</code>. Function tags are not supported.</p>
+    </div>
+</div>
+<ul>
+    <li>Both keys missing (or false): warning, nothing happens.</li>
+    <li>A malformed id is an error; a function no datapack defines is a warning (only the function is ignored).</li>
+    <li>On experience drops, <code>on_drop</code> is ignored with a warning.</li>
+</ul>
+
+<h2>How the function runs</h2>
+<ul>
+    <li>It runs <strong>as the dropped item, at the item</strong>: <code>@s</code> is the item and <code>~ ~ ~</code> is
+        where it landed.</li>
+    <li>It runs at the end of the tick the item spawned in, with permission level 2 and no chat output.</li>
+    <li>While it runs, the drop's player carries the tag <code>alkahestdrops.drop_player</code>, so
+        <code>@a[tag=alkahestdrops.drop_player]</code> selects them. The tag is removed right after.</li>
+    <li>The drop's player is the killer, the shearer or hitter, the breaker, or the owner of a per-player drop.
+        Machines' fake players are not tagged. Lightning, periodic and explosion drops have no player.</li>
+    <li>If the item is gone before the end of the tick (merged into another stack, killed), the function does not run.</li>
+</ul>
+
+<h2>Recipes</h2>
+
+<h3>Legendary drop</h3>
+<p>Sound, totem particles, a chat message naming the player and the item, and an action bar title.</p>
+<pre data-title="data/mypack/functions/legendary_drop.mcfunction"><code data-lang="mcfunction"># Runs as the dropped item, at the item.
+playsound minecraft:ui.toast.challenge_complete player @a ~ ~ ~ 1 1
+particle minecraft:totem_of_undying ~ ~0.5 ~ 0.2 0.5 0.2 0.3 40
+particle minecraft:dust 1 0.6 0 1.5 ~ ~1 ~ 0.1 1 0.1 0 30
+tellraw @a ["",{"selector":"@a[tag=alkahestdrops.drop_player]","color":"gold"},{"text":" found a legendary ","color":"gold"},{"selector":"@s"}]
+title @a[tag=alkahestdrops.drop_player] actionbar {"text":"Legendary drop!","color":"gold","bold":true}</code></pre>
+
+<h3>Server announcement</h3>
+<pre data-title="data/mypack/functions/announce.mcfunction"><code data-lang="mcfunction">tellraw @a ["",{"text":"[Drops] ","color":"aqua"},{"selector":"@a[tag=alkahestdrops.drop_player]"},{"text":" got "},{"selector":"@s","color":"yellow"},{"text":"!"}]</code></pre>
+
+<h3>Colored particle column</h3>
+<pre data-title="data/mypack/functions/beam.mcfunction"><code data-lang="mcfunction">particle minecraft:dust 0.4 0.2 1 2 ~ ~1 ~ 0.05 1.5 0.05 0 80 force
+particle minecraft:end_rod ~ ~0.5 ~ 0 1 0 0.05 20 force
+playsound minecraft:block.amethyst_block.chime block @a ~ ~ ~ 1 1.2</code></pre>
+
+<h3>Punish nearby players</h3>
+<p>A cursed drop that hurts everyone close except the player who got it.</p>
+<pre data-title="data/mypack/functions/cursed.mcfunction"><code data-lang="mcfunction">effect give @a[distance=..16,tag=!alkahestdrops.drop_player] minecraft:wither 5 1
+particle minecraft:smoke ~ ~0.5 ~ 1 0.5 1 0.02 60
+playsound minecraft:entity.wither.ambient hostile @a ~ ~ ~ 1 0.8</code></pre>
+
+<h3>Reward the player</h3>
+<pre data-title="data/mypack/functions/reward.mcfunction"><code data-lang="mcfunction">experience add @a[tag=alkahestdrops.drop_player] 50 points
+effect give @a[tag=alkahestdrops.drop_player] minecraft:luck 600 0</code></pre>
+
+<h2>Using it in a drop file</h2>
+<pre data-title="data/mypack/mob_drops/rabbit_diamond.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:rabbit",
+  "drops": [
+    {
+      "item": "minecraft:diamond",
+      "chance": 0.02,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "on_drop": { "glow": true, "run_function": "mypack:legendary_drop" }
+    }
+  ]
+}</code></pre>
+
+<div class="callout callout--warn">
+    <span class="callout__title">Limits</span>
+    <ul>
+        <li>Actions happen only when the drop spawns as an item in the world. A grave mod that keeps the drops, or an
+            auto-pickup mod that puts them straight into an inventory, skips them.</li>
+        <li>A function runs once. Effects that last until pickup would need a repeating function of your own.</li>
+        <li><code>simulate ... drop</code> runs no actions. JEI does not show them.</li>
+    </ul>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

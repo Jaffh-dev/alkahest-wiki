@@ -1,0 +1,10 @@
+# Local tooling and private planning notes (not part of the published site)
+.claude/
+notes/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="behaviors">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drop behaviors · Alkahest Drops</title>
+    <meta name="description" content="How Alkahest Drops picks the count of a drop: uniform, fixed_rolls, chained_rolls, max_health, hardness and damage_taken, with worked numbers and calculators.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/behaviors.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Drop behaviors</h1>
+<p class="docs-lead">
+    <code>drop_behavior</code> decides how many items drop once the <code>chance</code> succeeds. The result always stays
+    inside <code>count</code> (after enchantment bonuses).
+</p>
+
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Type</th><th>Count</th><th>Where</th></tr></thead>
+    <tbody>
+        <tr><td><code>uniform</code></td><td>Any number from min to max, all equally likely.</td><td>Mobs, blocks</td></tr>
+        <tr><td><code>fixed_rolls</code></td><td>Starts at min; a fixed number of independent rolls each add some.</td><td>Mobs, blocks</td></tr>
+        <tr><td><code>chained_rolls</code></td><td>Starts at min; keeps adding while rolls succeed, stops at the first failure.</td><td>Mobs, blocks</td></tr>
+        <tr><td><code>max_health</code></td><td>Grows with the mob's max health.</td><td>Mobs</td></tr>
+        <tr><td><code>hardness</code></td><td>Grows with the block's hardness.</td><td>Blocks</td></tr>
+        <tr><td><code>damage_taken</code></td><td>Grows with the damage a hit dealt.</td><td>Mobs, <code>"on": "hit"</code> only</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>uniform</h2>
+<pre><code data-lang="json">"count": { "min": 1, "max": 3 },
+"drop_behavior": { "type": "uniform" }</code></pre>
+<p>1, 2 or 3, each a third of the time. Roll keys (<code>rolls</code>, <code>chance_per_roll</code>,
+    <code>increment_value</code>) are ignored with a warning.</p>
+
+<h2>fixed_rolls</h2>
+<pre><code data-lang="json">"count": { "min": 0, "max": 6 },
+"drop_behavior": { "type": "fixed_rolls", "rolls": 3, "chance_per_roll": 0.5, "increment_value": 2 }</code></pre>
+<p>The count starts at <code>min</code>. Then <code>rolls</code> rolls are made, each with
+    <code>chance_per_roll</code>; every success adds <code>increment_value</code>. Rolls stop early once the count
+    reaches <code>max</code>, and the result never goes above it. Here: three coin flips worth 2 each, so 0, 2, 4 or 6.</p>
+
+<h2>chained_rolls</h2>
+<pre><code data-lang="json">"count": { "min": 1, "max": 10 },
+"drop_behavior": { "type": "chained_rolls", "rolls": 9, "chance_per_roll": 0.5, "increment_value": 1 }</code></pre>
+<p>Like <code>fixed_rolls</code>, but the first failed roll ends it. Each extra item is less likely than the one
+    before: here 1 item half the time, 2 a quarter of the time, 3 an eighth, and so on. Good for "usually one, rarely
+    a lot".</p>
+
+<h3>Roll settings</h3>
+<p>All three keys are required for both roll types.</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Key</th><th>Range</th><th>Out of range</th></tr></thead>
+    <tbody>
+        <tr><td><code>rolls</code></td><td>0 to <code>max_rolls</code> (1024)</td><td>0 becomes 1 (warning) unless an enchantment adds rolls; above the limit is clamped.</td></tr>
+        <tr><td><code>chance_per_roll</code></td><td>0 to 1</td><td>0 is an error unless an enchantment adds roll chance; above 1 is clamped.</td></tr>
+        <tr><td><code>increment_value</code></td><td>0 to <code>max_increment</code> (1024)</td><td>0 becomes 1 (warning) unless an enchantment adds increment; above the limit is clamped.</td></tr>
+    </tbody>
+</table>
+</div>
+<p>Negative values are errors.</p>
+
+<div class="tool" data-roll-tool>
+    <p class="tool__title">Roll calculator</p>
+    <div class="tool__fields">
+        <label>Type
+            <select data-field="type">
+                <option value="fixed_rolls">fixed_rolls</option>
+                <option value="chained_rolls">chained_rolls</option>
+            </select>
+        </label>
+        <label>count.min <input type="number" data-field="min" value="0" min="0" step="1"></label>
+        <label>count.max <input type="number" data-field="max" value="6" min="0" step="1"></label>
+        <label>rolls <input type="number" data-field="rolls" value="3" min="0" max="64" step="1"></label>
+        <label>chance_per_roll <input type="number" data-field="chance" value="0.5" min="0" max="1" step="0.05"></label>
+        <label>increment_value <input type="number" data-field="increment" value="2" min="1" step="1"></label>
+    </div>
+    <p class="tool__result" data-roll-result aria-live="polite"></p>
+    <div data-roll-table></div>
+</div>
+
+<h2>max_health</h2>
+<p>For mobs. The count follows the mob's max health:</p>
+<pre><code>count = clamp( round( multiplier × f(max_health / divisor) ), count.min, count.max )</code></pre>
+<pre><code data-lang="json">"count": { "min": 1, "max": 16 },
+"drop_behavior": { "type": "max_health", "function": "log", "multiplier": 3, "divisor": 10 }</code></pre>
+<ul>
+    <li><code>function</code>: <code>linear</code> (f(x) = x) or <code>log</code> (natural log, f(x) = ln x). Optional, default <code>linear</code>.</li>
+    <li><code>multiplier</code>, <code>divisor</code>: optional, default 1, must be above 0.</li>
+    <li><code>count</code> is the clamp: <code>min</code> may be 0, <code>max</code> is the cap.</li>
+    <li>With these numbers: zombie (20 health) → 3 × ln 2 ≈ 2.08 → <strong>2</strong>; wither (300) → 3 × ln 30 ≈ 10.2 → <strong>10</strong>.</li>
+</ul>
+<p>Roll settings and the <code>bonus_roll</code> enchantment bonus are ignored (warning). <code>chance</code> still
+    applies, and a <code>bonus_count</code> enchantment bonus raises the clamp bounds.</p>
+
+<h2>hardness</h2>
+<p>For blocks: same keys and formula, reading the block's hardness (stone 1.5, obsidian 50, ores 3) instead of max
+    health. A hardness of 0 or less (instant-break blocks, bedrock) gives <code>count.min</code>. Hardness values are
+    small, so <code>log</code> is very flat; this behavior is most useful on <code>*</code>, <code>mod:*</code> or tag
+    targets, where one file covers blocks of many hardnesses.</p>
+<pre><code data-lang="json">"count": { "min": 0, "max": 10 },
+"drop_behavior": { "type": "hardness", "function": "linear", "multiplier": 1, "divisor": 5 }</code></pre>
+<p>Stone: 1.5 / 5 = 0.3 → 0. Obsidian: 50 / 5 = 10 → 10.</p>
+
+<h2>damage_taken</h2>
+<p>For mob drops with <code>"on": "hit"</code> only (see <a href="triggers.html">Triggers</a>). Same keys and formula,
+    reading the health the hit took: after armor, Resistance and absorption hearts, and never more than the health the
+    mob had before the hit. A hit that deals no damage drops nothing, whatever <code>count.min</code> says.</p>
+<pre><code data-lang="json">"on": "hit",
+"count": { "min": 1, "max": 20 },
+"drop_behavior": { "type": "damage_taken", "function": "linear", "multiplier": 1, "divisor": 1 }</code></pre>
+<p>One item per point of damage (half a heart), up to 20.</p>
+
+<div class="tool" data-scale-tool>
+    <p class="tool__title">Scale calculator (max_health, hardness, damage_taken)</p>
+    <div class="tool__fields">
+        <label>Value (health, hardness, damage) <input type="number" data-field="value" value="20" step="0.5"></label>
+        <label>function
+            <select data-field="function">
+                <option value="linear">linear</option>
+                <option value="log" selected>log</option>
+            </select>
+        </label>
+        <label>multiplier <input type="number" data-field="multiplier" value="3" step="0.1"></label>
+        <label>divisor <input type="number" data-field="divisor" value="10" step="0.1"></label>
+        <label>count.min <input type="number" data-field="min" value="1" min="0" step="1"></label>
+        <label>count.max <input type="number" data-field="max" value="16" min="0" step="1"></label>
+    </div>
+    <p class="tool__result" data-scale-result aria-live="polite"></p>
+</div>
+
+<h2>Scale keys on other types</h2>
+<p><code>function</code>, <code>multiplier</code> and <code>divisor</code> on a non-scaled type are ignored with a
+    warning. <code>max_health</code> or <code>damage_taken</code> in a block file, and <code>hardness</code> in a mob
+    file, are errors (the drop is skipped).</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

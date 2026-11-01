@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="experience">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Experience drops · Alkahest Drops</title>
+    <meta name="description" content="Add, remove and set mob and block experience with Alkahest Drops: experience drops and experience removals.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Experience drops</h1>
+<p class="docs-lead">
+    A drop can give experience instead of an item. A removal entry can take experience away. Together they set the
+    experience of any mob or block.
+</p>
+
+<h2>Adding experience</h2>
+<p>Write <code>"experience": true</code> instead of <code>item</code>. <code>count</code> is the amount of experience.</p>
+<pre data-title="data/mypack/block_drops/stone_xp.json"><code data-lang="json">{
+  "version": 1,
+  "block": "minecraft:stone",
+  "drops": [
+    {
+      "experience": true,
+      "chance": 1,
+      "count": { "min": 1, "max": 3 },
+      "drop_behavior": { "type": "uniform" },
+      "enchant_bonus": [
+        { "enchant": "minecraft:fortune",
+          "on_enchant": { "bonus_count": { "bonus_max_per_level": 1 } } }
+      ]
+    }
+  ]
+}</code></pre>
+<p>An experience drop uses <code>chance</code>, <code>count</code>, <code>drop_behavior</code>,
+    <code>enchant_bonus</code> and local <code>conditions</code>. <code>nbt</code>, <code>functions</code> and
+    <code>on_drop</code> are ignored with a warning. Writing both <code>item</code> and <code>"experience": true</code>
+    is an error.</p>
+
+<h2>When experience drops</h2>
+<p>As in vanilla:</p>
+<ul>
+    <li><strong>Mobs</strong>: only when a player kills them.</li>
+    <li><strong>Blocks</strong>: only when a player breaks them with a tool that can harvest them; never from
+        explosions or in creative mode.</li>
+    <li>Silk Touch does not stop experience by itself. Add a condition if you want that.</li>
+    <li>On other <a href="triggers.html">triggers</a> (shear, hit, lightning, periodic), experience orbs spawn at the mob.</li>
+</ul>
+
+<h2>Removing experience</h2>
+<pre data-title="data/mypack/block_drops/diamond_ore_no_xp.json"><code data-lang="json">{
+  "version": 1,
+  "block": "minecraft:diamond_ore",
+  "removals": [ { "experience": true } ]
+}</code></pre>
+<p>This removes the vanilla experience and the experience drops of <strong>other</strong> namespaces. Like item
+    removals, it never touches the drops of its own namespace. Item entries (even <code>"*"</code>) never remove
+    experience.</p>
+
+<h2>Setting experience to an exact amount</h2>
+<p>A removal file and a drop file in the same namespace: the removal clears vanilla experience, the drop adds yours.</p>
+<pre data-title="data/mypack/mob_drops/cow_xp_remove.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:cow",
+  "removals": [ { "experience": true } ]
+}</code></pre>
+<pre data-title="data/mypack/mob_drops/cow_xp_add.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:cow",
+  "drops": [
+    {
+      "experience": true,
+      "chance": 1,
+      "count": { "min": 10, "max": 10 },
+      "drop_behavior": { "type": "uniform" },
+      "enchant_bonus": [
+        { "enchant": "minecraft:looting",
+          "on_enchant": { "bonus_count": { "bonus_min_per_level": 5, "bonus_max_per_level": 5 } } }
+      ]
+    }
+  ]
+}</code></pre>
+<p>Cows now give exactly 10 experience, plus 5 per Looting level.</p>
+
+<h2>Conditional experience removal</h2>
+<pre data-title="No experience while sneaking, for every mob"><code data-lang="json">{
+  "version": 1,
+  "entity": "*",
+  "removals": [
+    { "experience": true,
+      "conditions": [
+        { "condition": "minecraft:entity_properties", "entity": "killer",
+          "predicate": { "flags": { "is_sneaking": true } } }
+      ] }
+  ]
+}</code></pre>
+
+<div class="callout callout--warn">
+    <span class="callout__title">Ender Dragon</span>
+    <p>The Ender Dragon gives its experience in its own way, outside the event Alkahest Drops uses, so its vanilla
+        experience cannot be removed.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

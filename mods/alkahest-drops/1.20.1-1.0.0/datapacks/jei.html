@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="jei">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>JEI and multiplayer · Alkahest Drops</title>
+    <meta name="description" content="How Alkahest Drops shows drops in JEI, and what servers and players need installed.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>JEI and multiplayer</h1>
+<p class="docs-lead">
+    Alkahest Drops runs on the server. JEI is optional: with it, players see a page for every mob and block with
+    everything it drops.
+</p>
+
+<h2>Who needs what</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Setup</th><th>Drops work</th><th>JEI pages</th></tr></thead>
+    <tbody>
+        <tr><td>Singleplayer with Alkahest Drops</td><td>Yes</td><td>With JEI installed</td></tr>
+        <tr><td>Server with Alkahest Drops, player with Alkahest Drops and JEI</td><td>Yes</td><td>Yes</td></tr>
+        <tr><td>Server with Alkahest Drops, Forge player without it</td><td>Yes</td><td>No</td></tr>
+    </tbody>
+</table>
+</div>
+<p>Drops, commands and checks all happen on the server. Players only need the mod (with JEI) to see the JEI pages.</p>
+
+<h2>What JEI shows</h2>
+<ul>
+    <li>A page for every mob that can die and every block that drops something, with its <strong>full</strong> loot:
+        the vanilla loot table, vanilla experience, and Alkahest Drops drops and removals.</li>
+    <li>One page per trigger of a mob: death first, then shear, hit, lightning, periodic. Non-death pages show only
+        Alkahest Drops drops.</li>
+    <li>Each drop's tooltip: chance, count, rolls, and icons for enchantment bonuses, conditions, pity, first drop and
+        per player. Hold <kbd>Shift</kbd> for details, such as each enchantment's bonus.</li>
+    <li>Mobs are JEI ingredients: look up what a mob drops, or which mobs drop an item.</li>
+    <li>The pages refresh after every <code>/reload</code>.</li>
+</ul>
+
+<h2>Cost</h2>
+<p>The JEI data is built once per datapack load on the server and sent only to players who have the mod and JEI.
+    Without JEI there is no network traffic and no client cost.</p>
+
+<div class="callout callout--warn">
+    <span class="callout__title">What JEI cannot show</span>
+    <ul>
+        <li>Drops other mods add in code (global loot modifiers, drop events): only loot table files are read.</li>
+        <li>Complex loot tables (alternatives, nested tables) are shown approximately.</li>
+        <li>Conditions that cannot be described are summed up as "has hidden conditions".</li>
+        <li><code>on_drop</code> actions.</li>
+    </ul>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

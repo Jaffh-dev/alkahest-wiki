@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="validation">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Validation and limits · Alkahest Drops</title>
+    <meta name="description" content="How Alkahest Drops checks files: errors, warnings, what gets skipped, the log format and the server config limits.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Validation and limits</h1>
+<p class="docs-lead">
+    Every file is checked when datapacks load. Problems never crash the game: they skip as little as possible and are
+    reported in the log and by <code>/alkdrops validate</code>.
+</p>
+
+<h2>Errors and warnings</h2>
+<dl>
+    <dt>Error</dt>
+    <dd>Something is wrong or missing. The smallest part that contains it is skipped: the whole file (file-level keys),
+        one drop, or one removal entry.</dd>
+    <dt>Warning</dt>
+    <dd>Something was fixed or ignored: a value clamped into range, a key that has no effect, an id of a mod that is not
+        installed. The rest loads.</dd>
+</dl>
+<p>Log lines look like this, with the JSON path of the problem:</p>
+<pre><code>[alkahestdrops] mypack:zombie_diamond: drops[0].count.max: is 5000, above the limit 1024; clamped to 1024</code></pre>
+
+<h2>File-level problems (file skipped)</h2>
+<ul>
+    <li><code>version</code> missing, or newer than this version of the mod supports.</li>
+    <li><code>entity</code> / <code>block</code> missing, malformed, or the other format's key.</li>
+    <li>Both <code>drops</code> and <code>removals</code>, or neither.</li>
+    <li>A removal file on <code>minecraft:player</code>.</li>
+    <li><code>on</code> in a block file, or an unknown trigger in a removal file.</li>
+    <li>No valid entry left after skipping the bad ones. When every entry was skipped only because of unknown item ids
+        (an optional mod is missing), it is a warning instead.</li>
+    <li>Invalid JSON.</li>
+</ul>
+<p>An unknown target id, or a namespace with nothing registered, also skips the file, but as a warning.</p>
+
+<h2>Common drop problems</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Problem</th><th>Result</th></tr></thead>
+    <tbody>
+        <tr><td><code>chance</code> above 1</td><td>Clamped to 1 (warning)</td></tr>
+        <tr><td><code>chance</code> below 0, or 0 without a chance bonus</td><td>Error</td></tr>
+        <tr><td><code>count.min</code> above <code>count.max</code></td><td>Error</td></tr>
+        <tr><td><code>count.max</code> above <code>max_count</code></td><td>Clamped (warning)</td></tr>
+        <tr><td><code>count</code> 0 to 0 without count bonuses</td><td>Error</td></tr>
+        <tr><td>Missing <code>item</code>, <code>chance</code>, <code>count</code> or <code>drop_behavior</code></td><td>Error</td></tr>
+        <tr><td>Unknown item id</td><td>Drop skipped (warning)</td></tr>
+        <tr><td><code>item</code> and <code>"experience": true</code> together</td><td>Error</td></tr>
+        <tr><td>Roll keys on <code>uniform</code></td><td>Ignored (warning)</td></tr>
+        <tr><td><code>chance_per_roll</code> 0 without a roll chance bonus</td><td>Error (clamping would turn a typo into "always")</td></tr>
+        <tr><td>Invalid NBT, loot function or condition</td><td>Error</td></tr>
+        <tr><td>Unknown enchantment in <code>enchant_bonus</code></td><td>That entry skipped (warning)</td></tr>
+        <tr><td>The same <code>id</code> twice in a file</td><td>The later drop skipped (error)</td></tr>
+    </tbody>
+</table>
+</div>
+<p>Each page of this guide lists the rules of its keys.</p>
+
+<h2>Server config</h2>
+<p>Per-world limits in <code>&lt;world&gt;/serverconfig/alkahestdrops-server.toml</code>. The file is read again on
+    every <code>/reload</code>.</p>
+<pre data-title="serverconfig/alkahestdrops-server.toml"><code data-lang="toml"># Limits of Alkahest Drops files. Values above a limit are clamped with a warning in the log.
+# Changes apply on the next /reload.
+[limits]
+	# Highest rolls of a roll-based drop_behavior, and of its enchantment roll bonus.
+	# Rolls run on every kill or block break, so high values cost server time.
+	max_rolls = 1024
+	# Highest count.min/count.max of a drop, and of its enchantment count bonus.
+	max_count = 1024
+	# Highest increment_value of a roll-based drop_behavior, and of its enchantment increment bonus.
+	max_increment = 1024</code></pre>
+<p>Each limit goes from 1 to 1,000,000. Values above a limit are clamped with a warning.</p>
+
+<h2>Workflow</h2>
+<ol class="steps">
+    <li>Edit a file and run <code>/reload</code>.</li>
+    <li><code>/alkdrops validate errors</code>: fix anything skipped.</li>
+    <li><code>/alkdrops validate warnings &lt;namespace&gt;</code>: check nothing was clamped by surprise.</li>
+    <li><code>/alkdrops drops &lt;target&gt;</code> and <code>/alkdrops simulate ...</code> to confirm the result.</li>
+</ol>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

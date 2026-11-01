@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="developers" data-page="drop-files-in-mods">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Drop files in your mod · Alkahest Drops</title>
+    <meta name="description" content="Ship Alkahest Drops drop and removal files inside a mod's resources, with no dependency: they are ignored when Alkahest Drops is not installed.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Drop files in your mod</h1>
+<p class="docs-lead">
+    A mod's <code>data/</code> folder is a datapack. Put Alkahest Drops files there and they load when Alkahest Drops is
+    installed, and are simply ignored when it is not. No dependency, no code, no crash.
+</p>
+
+<h2>Where the files go</h2>
+<pre class="tree" data-title="Your mod project">src/main/resources/
+└── data/
+    └── mymod/
+        ├── mob_drops/
+        │   └── frost_golem.json
+        └── block_drops/
+            └── frost_ore.json</pre>
+<p>Use your mod id as the namespace. The file format is the same as in datapacks: see the
+    <a href="../datapacks/drop-files.html">datapack guide</a>.</p>
+<pre data-title="src/main/resources/data/mymod/mob_drops/frost_golem.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "mymod:frost_golem",
+  "drops": [
+    {
+      "item": "mymod:frost_core",
+      "chance": 0.1,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "enchant_bonus": [
+        { "enchant": "minecraft:looting",
+          "on_enchant": { "bonus_chance": { "bonus_chance_per_level": 0.05, "max_bonus_chance": 0.15 } } }
+      ],
+      "id": "frost_core",
+      "pity": 20
+    }
+  ]
+}</code></pre>
+
+<h2>Why this is safe</h2>
+<ul>
+    <li>Minecraft only reads data folders it knows. Without Alkahest Drops, nobody reads <code>mob_drops/</code> or
+        <code>block_drops/</code>.</li>
+    <li>Your normal loot tables still work as usual in both cases.</li>
+    <li>Pack makers can override your files with a datapack that has the same path, or remove your drops with a
+        removal file in their own namespace.</li>
+</ul>
+
+<h2>Things to keep in mind</h2>
+<dl>
+    <dt>The namespace rule</dt>
+    <dd>A removal file never removes drops of its own namespace. A removal file in <code>mymod</code> can remove vanilla
+        drops and other namespaces' drops, but not your own drop files; that is what makes "replace a drop" work. Pack
+        makers use their own namespace to remove yours.</dd>
+    <dt>Alkahest Drops loot conditions</dt>
+    <dd><code>alkahestdrops:killed_by_real_player</code> and <code>alkahestdrops:broken_by_real_player</code> are fine
+        inside Alkahest Drops files. Do not put them in your regular loot tables unless Alkahest Drops is a required
+        dependency: without it, the condition is unknown and that loot table fails to load.</dd>
+    <dt>Items of other mods</dt>
+    <dd>An item or target of a mod that is not installed skips that drop or file with a warning, never an error, so
+        files can mention optional mods.</dd>
+    <dt>Stable progress</dt>
+    <dd>Give every <code>pity</code> or <code>first_kill</code> drop an <code>id</code>, so updating the file never resets
+        players' progress.</dd>
+</dl>
+
+<h2>Testing</h2>
+<p>Add Alkahest Drops to your development runtime (see <a href="setup.html">Depending on the API</a>), start a world
+    and use <code>/alkdrops validate mymod</code> and <code>/alkdrops simulate entity mymod:frost_golem 1000</code>.</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

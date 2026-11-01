@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="developers" data-page="stability">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stability and stable ids · Alkahest Drops</title>
+    <meta name="description" content="The Alkahest Drops API promise: semantic versioning, what is internal, and the ids that never change.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Stability and stable ids</h1>
+<p class="docs-lead">What you can rely on when you depend on Alkahest Drops.</p>
+
+<h2>The API promise</h2>
+<p>Everything in <code>com.jaffh.alkahestdrops.api</code> and its subpackages follows
+    <a href="https://semver.org/">semantic versioning</a>:</p>
+<ul>
+    <li><strong>No breaking change within a major version.</strong> Code built against API 1.0 works with every 1.x.</li>
+    <li><strong>Deprecation before removal.</strong> Anything removed is deprecated for at least one minor version first.</li>
+    <li><strong><code>@since</code> on everything.</strong> Each type and method says which version added it.</li>
+    <li><strong>Internal means internal.</strong> Classes outside <code>api</code> may change in any release; do not
+        depend on them.</li>
+</ul>
+<p>Parameters are non-null unless marked <code>@Nullable</code>.</p>
+
+<h2>Version numbers</h2>
+<p>A release is named <code>&lt;minecraft&gt;-&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code>, such as
+    <code>1.20.1-1.0.0</code>. The API version (1.0.0 in this release) is listed in each release's changelog.</p>
+
+<h2>Stable ids</h2>
+<p>These ids are final and will not be renamed:</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Id</th><th>Kind</th></tr></thead>
+    <tbody>
+        <tr><td><code>alkahestdrops</code></td><td>Mod id</td></tr>
+        <tr><td><code>alkahestdrops:killed_by_real_player</code></td><td>Loot condition (mobs)</td></tr>
+        <tr><td><code>alkahestdrops:broken_by_real_player</code></td><td>Loot condition (blocks)</td></tr>
+        <tr><td><code>alkahestdrops.drop_player</code></td><td>Entity tag on the drop's player while <code>run_function</code> runs</td></tr>
+        <tr><td><code>mob_drops/</code>, <code>block_drops/</code></td><td>Data folders</td></tr>
+        <tr><td>Format version 1 keys</td><td>Every key of the <a href="../datapacks/drop-files.html">drop file reference</a></td></tr>
+        <tr><td><code>mob:&lt;file&gt;@&lt;id&gt;</code>, <code>block:&lt;file&gt;@&lt;id&gt;</code></td><td>Drop key format</td></tr>
+        <tr><td><code>OnDropEvent</code>, <code>DropFilesLoadedEvent</code></td><td>Events</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>File format versions</h2>
+<p>Every file declares <code>"version": 1</code>. A future format would be version 2, and the mod would keep reading
+    version 1 files. Planned additions (such as mod-registered <code>on_drop</code> actions) were designed to fit into
+    version 1.</p>
+
+<h2>Roadmap</h2>
+<ul>
+    <li><strong>Now:</strong> Minecraft 1.20.1 on Forge.</li>
+    <li><strong>API 1.1:</strong> <code>on_drop</code> action types registered by other mods.</li>
+    <li><strong>Planned for the docs:</strong> a JSON Schema for editor autocomplete, and a drop file generator.</li>
+    <li><strong>Later, if there is interest:</strong> EMI support, KubeJS integration, NeoForge on newer Minecraft versions.</li>
+</ul>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

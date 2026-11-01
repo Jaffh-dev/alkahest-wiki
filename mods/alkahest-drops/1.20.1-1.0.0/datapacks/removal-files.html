@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="removal-files">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Removal files · Alkahest Drops</title>
+    <meta name="description" content="Remove drops from loot tables, other mods and other datapacks with Alkahest Drops removal files, and replace drops.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Removal files</h1>
+<p class="docs-lead">
+    A removal file takes drops away from a mob or block: drops of its loot table, drops other mods add, and drops
+    that drop files of <strong>other namespaces</strong> add. It can also turn off experience.
+</p>
+
+<h2>Example</h2>
+<pre data-title="data/mypack/mob_drops/zombie_no_flesh.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "removals": [
+    "minecraft:rotten_flesh",
+    "#minecraft:music_discs",
+    { "item": "minecraft:iron_ingot", "conditions": [ { "condition": "minecraft:killed_by_player" } ] },
+    { "experience": true, "conditions": [
+        { "condition": "minecraft:inverted", "term": { "condition": "minecraft:killed_by_player" } } ] }
+  ]
+}</code></pre>
+<p>Zombies stop dropping rotten flesh and music discs, drop no iron ingot when a player kills them, and give no
+    experience when they are not killed by a player.</p>
+
+<h2>File keys</h2>
+<div class="key-list">
+    <div class="key">
+        <div class="key__head"><span class="key__name">version</span><span class="key__type">integer</span><span class="required">Required</span></div>
+        <p>Always <code>1</code>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">entity</span> / <span class="key__name">block</span><span class="key__type">string</span><span class="required">Required</span></div>
+        <p>Same targets as drop files: id, <code>#tag</code>, <code>mod:*</code> or <code>*</code>.
+            <code>minecraft:player</code> is not allowed: a player's drops are their inventory.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">conditions</span><span class="key__type">array of loot conditions</span><span class="optional">Optional</span></div>
+        <p>Global conditions: when one fails, nothing in the file is removed.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">on</span><span class="key__type">string</span><span class="optional">Optional · mobs</span></div>
+        <p>Which trigger's drops the file removes: <code>death</code> (default), <code>shear</code>, <code>hit</code>,
+            <code>lightning</code>, <code>periodic</code>. See <a href="triggers.html">Triggers</a>.</p>
+    </div>
+    <div class="key">
+        <div class="key__head"><span class="key__name">removals</span><span class="key__type">array</span><span class="required">Required</span></div>
+        <p>What to remove. Each entry is one of the forms below.</p>
+    </div>
+</div>
+
+<h2>Removal entries</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Entry</th><th>Removes</th></tr></thead>
+    <tbody>
+        <tr><td><code>"minecraft:rotten_flesh"</code></td><td>That item.</td></tr>
+        <tr><td><code>"#minecraft:wool"</code></td><td>Every item in the item tag.</td></tr>
+        <tr><td><code>"*"</code></td><td>Every item drop. Experience is not touched.</td></tr>
+        <tr><td><code>{ "item": "...", "conditions": [...] }</code></td><td>The item (or tag, or <code>*</code>), only when the conditions pass. <code>conditions</code> is required in this form.</td></tr>
+        <tr><td><code>{ "experience": true }</code></td><td>All experience. <code>conditions</code> is optional.</td></tr>
+    </tbody>
+</table>
+</div>
+<p>An unknown item id skips that entry with a warning (the mod may not be installed); the rest of the file still
+    loads.</p>
+
+<h2>The namespace rule</h2>
+<p>
+    A removal file removes drops of the loot table, of other mods, and of drop files in <strong>other</strong>
+    namespaces. It never removes drops added by drop files in <strong>its own</strong> namespace.
+</p>
+<p>That rule gives you two things:</p>
+<ul>
+    <li><strong>Replacing a drop</strong> is a removal file and a drop file in the same namespace: the removal clears
+        the vanilla drop, your drop file adds the new one, and the removal does not touch it.</li>
+    <li><strong>Packs can undo each other.</strong> A modpack's namespace can remove a drop that a mod's drop file adds.</li>
+</ul>
+<p>Load order never matters: removals are computed against every loaded file at once.</p>
+
+<h3>Example: replace rotten flesh with 3 to 5 rotten flesh</h3>
+<pre data-title="data/mypack/mob_drops/zombie_flesh_remove.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "removals": [ "minecraft:rotten_flesh" ]
+}</code></pre>
+<pre data-title="data/mypack/mob_drops/zombie_flesh_add.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "drops": [
+    {
+      "item": "minecraft:rotten_flesh",
+      "chance": 1,
+      "count": { "min": 3, "max": 5 },
+      "drop_behavior": { "type": "uniform" }
+    }
+  ]
+}</code></pre>
+
+<h2>Removing experience</h2>
+<p>
+    <code>{ "experience": true }</code> removes the mob's or block's normal experience and the experience drops of
+    other namespaces, never those of its own namespace. "Set the experience to N" is a removal file with an experience
+    entry plus an experience drop in the same namespace. See <a href="experience.html">Experience drops</a>.
+</p>
+<p>Item entries, even <code>"*"</code>, never remove experience.</p>
+
+<h2>Removal files and triggers</h2>
+<p>
+    A removal file applies only to the drops of its <code>on</code> trigger. For <code>shear</code>, <code>hit</code>,
+    <code>lightning</code> and <code>periodic</code> it only removes Alkahest Drops drops of other namespaces: the game's
+    own drops of those actions (sheep wool, chicken eggs) spawn without an event to filter, so they are never removed.
+</p>
+
+<div class="callout callout--warn">
+    <span class="callout__title">What a removal file cannot remove</span>
+    <p>Drops a block or mod creates in its own code (outside loot tables), and the drops of a removal file's own
+        namespace. See <a href="known-limits.html">Known limits</a>.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

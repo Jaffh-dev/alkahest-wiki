@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-root="../../" data-mod="alkahest-drops">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alkahest Drops · Alkahest Wiki</title>
+    <meta name="description" content="Alkahest Drops documentation: data-driven mob and block drops for Minecraft Forge, for datapack creators and mod developers.">
+    <link rel="icon" href="../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    <link rel="stylesheet" href="../../assets/css/mod.css">
+    <script src="../../assets/js/core/theme.js"></script>
+    <script src="../../assets/js/data/mods.js" defer></script>
+    <script src="../../assets/js/core/site.js" defer></script>
+    <script src="../../assets/js/core/versions.js" defer></script>
+    <script src="../../assets/js/pages/mod-landing.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+
+    <main id="content">
+        <section class="mod-hero">
+            <div class="mod-hero__inner">
+                <img class="mod-hero__icon" src="../../assets/img/mods/alkahest-drops.svg" alt="" width="88" height="88">
+                <div class="mod-hero__text">
+                    <h1 class="mod-hero__title">Alkahest Drops</h1>
+                    <p class="mod-hero__lead">
+                        Data-driven mob and block drops for Minecraft Forge. Datapacks and mods add, remove and tune
+                        drops with JSON files, checked when they load, simulated in game and shown in JEI.
+                    </p>
+                    <div class="mod-hero__version" data-version-picker></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mod-body">
+            <div class="mod-body__inner">
+                <dl class="version-facts" data-version-facts></dl>
+
+                <h2 class="mod-body__title">Who are you?</h2>
+                <div class="audience-grid">
+                    <a class="audience-card" data-section-link="datapacks" href="1.20.1-1.0.0/datapacks/index.html">
+                        <span class="audience-card__kicker">Datapack guide</span>
+                        <span class="audience-card__title">I make datapacks or modpacks</span>
+                        <span class="audience-card__text">
+                            Write drop and removal files, set chances and roll counts, add enchantment bonuses,
+                            bad-luck protection and triggers, and test everything with <code>/alkdrops</code>.
+                        </span>
+                        <span class="audience-card__list">
+                            Getting started · Drop files · Removal files · Behaviors · Triggers · Recipes
+                        </span>
+                    </a>
+                    <a class="audience-card" data-section-link="developers" href="1.20.1-1.0.0/developers/index.html">
+                        <span class="audience-card__kicker">Developer guide</span>
+                        <span class="audience-card__title">I make mods</span>
+                        <span class="audience-card__text">
+                            Ship drop files in your mod with no dependency, react to drops with
+                            <code>OnDropEvent</code>, and read drops and player progress through the API.
+                        </span>
+                        <span class="audience-card__list">
+                            Overview · Setup · Events · Read API · Progress API · Stability
+                        </span>
+                    </a>
+                </div>
+
+                <div class="mod-columns">
+                    <section>
+                        <h2 class="mod-body__title">What it does</h2>
+                        <ul class="feature-list">
+                            <li><strong>Add drops</strong> to any mob or block: chance, count, roll-based counts, NBT, vanilla loot conditions and functions.</li>
+                            <li><strong>Remove drops</strong> from the loot table, other mods and other datapacks, by item, tag, everything or experience.</li>
+                            <li><strong>Target</strong> one id, a tag, every mob or block of a mod, or everything.</li>
+                            <li><strong>Enchantment bonuses</strong> for any enchantment, not only Looting and Fortune.</li>
+                            <li><strong>Bad-luck protection</strong>, first-kill drops and per-player drops.</li>
+                            <li><strong>Triggers</strong>: death, shear, hit, lightning, and drops over time.</li>
+                            <li><strong>Drop actions</strong>: make a drop glow or run a datapack function when it lands.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2 class="mod-body__title">In this version</h2>
+                        <ul class="feature-list" data-version-highlights></ul>
+                    </section>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

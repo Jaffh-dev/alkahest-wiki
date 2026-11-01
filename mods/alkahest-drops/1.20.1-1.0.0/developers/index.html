@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="developers" data-page="index">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Overview · Alkahest Drops</title>
+    <meta name="description" content="Alkahest Drops for mod developers: ship drop files with no dependency, react to drops with OnDropEvent, read drops and player progress through API 1.0.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>For mod developers</h1>
+<p class="docs-lead">
+    Alkahest Drops can be used at three levels. Start with the first: most mods never need more.
+</p>
+
+<div class="link-cards">
+    <a class="link-card" href="drop-files-in-mods.html">
+        <strong>1. Ship drop files</strong>
+        <span>Put <code>mob_drops/</code> and <code>block_drops/</code> files in your mod's resources. No dependency,
+            no code; ignored when Alkahest Drops is absent.</span>
+    </a>
+    <a class="link-card" href="events.html">
+        <strong>2. Listen to events</strong>
+        <span><code>OnDropEvent</code> when a drop spawns, <code>DropFilesLoadedEvent</code> after every reload.
+            Optional dependency.</span>
+    </a>
+    <a class="link-card" href="read-api.html">
+        <strong>3. Use the API</strong>
+        <span>Read what files do to a mob or block, read and reset a player's pity and first drops.</span>
+    </a>
+</div>
+
+<h2>What the API contains</h2>
+<p>Everything public lives in <code>com.jaffh.alkahestdrops.api</code> and follows semantic versioning from 1.0.0.
+    Classes outside <code>api</code> are internal and may change in any release.</p>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Type</th><th>Package</th><th>Purpose</th></tr></thead>
+    <tbody>
+        <tr><td><code>AlkahestDropsApi</code></td><td><code>api</code></td><td>Static entry point: read drops, read and reset progress.</td></tr>
+        <tr><td><code>TargetDrops</code>, <code>AddedDrop</code>, <code>DropRemoval</code></td><td><code>api</code></td><td>What drop and removal files do to one target.</td></tr>
+        <tr><td><code>DropTrigger</code></td><td><code>api</code></td><td>death, shear, hit, lightning, periodic.</td></tr>
+        <tr><td><code>DropOrigin</code></td><td><code>api</code></td><td>Sealed: <code>Mob(mob)</code> or <code>Block(state, pos)</code>.</td></tr>
+        <tr><td><code>OnDropEvent</code></td><td><code>api.event</code></td><td>A drop file item spawned (cancelable).</td></tr>
+        <tr><td><code>DropFilesLoadedEvent</code></td><td><code>api.event</code></td><td>Files loaded or reloaded.</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>Facts worth knowing</h2>
+<ul>
+    <li><strong>Server side.</strong> Drops, commands and checks run on the server. Forge clients without the mod can
+        join; players need the mod (with JEI) only to see JEI pages.</li>
+    <li><strong>No mixins.</strong> Mob drops use Forge's drop and experience events, block drops a global loot
+        modifier.</li>
+    <li><strong>JEI is optional</strong> and costs nothing when absent: no network channel traffic, no client work.</li>
+    <li><strong>A broken file never crashes a server.</strong> Errors skip the smallest part (file, drop or entry) and
+        are reported with their JSON path.</li>
+    <li><strong>Loot conditions and functions of any mod</strong> work inside drop files, so your own registered
+        conditions are usable by pack authors.</li>
+    <li><strong>Small footprint.</strong> Measured with spark: about 0.75 MB of heap for the loaded rules and the JEI
+        summary, no visible cost during gameplay.</li>
+    <li><strong>Tested alongside</strong> Twilight Forest, L_Ender's Cataclysm, Alex's Mobs, Biomes O' Plenty, Mekanism
+        and Farmer's Delight.</li>
+</ul>
+
+<h2>Versions</h2>
+<p>Mod versions read <code>&lt;minecraft&gt;-&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</code>, such as
+    <code>1.20.1-1.0.0</code>. This version ships API 1.0.0 for Minecraft 1.20.1 on Forge 47.4 or newer. See
+    <a href="stability.html">Stability and stable ids</a>.</p>
+
+<h2>Answering bug reports</h2>
+<p>When a player reports a strange drop from your mob or block, ask them to run
+    <code>/alkdrops drops &lt;id&gt;</code> or <code>/alkdrops sources &lt;item&gt;</code>. The output names every
+    Alkahest Drops file that adds or removes something, so you know right away whether a datapack is involved.</p>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

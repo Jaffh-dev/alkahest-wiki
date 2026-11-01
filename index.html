@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-root="">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alkahest Wiki</title>
+    <meta name="description" content="Documentation for the Alkahest family of Minecraft mods: guides for datapack creators and mod developers.">
+    <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <script src="assets/js/core/theme.js"></script>
+    <script src="assets/js/data/mods.js" defer></script>
+    <script src="assets/js/core/site.js" defer></script>
+    <script src="assets/js/pages/home.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+
+    <main id="content">
+        <section class="hero">
+            <div class="hero__inner">
+                <p class="hero__eyebrow">The Alkahest mod family</p>
+                <h1 class="hero__title">Alkahest Wiki</h1>
+                <p class="hero__lead">
+                    Documentation for the Alkahest Minecraft mods. Each mod has a guide for datapack creators and a
+                    guide for mod developers, for every released version.
+                </p>
+            </div>
+        </section>
+
+        <section class="mods" aria-labelledby="mods-title">
+            <div class="mods__inner">
+                <h2 class="mods__title" id="mods-title">Mods</h2>
+                <div class="mod-grid" data-mod-grid></div>
+                <noscript>
+                    <p class="noscript-warning">
+                        This site needs JavaScript for its menus. Open the
+                        <a href="mods/alkahest-drops/index.html">Alkahest Drops docs</a> directly.
+                    </p>
+                </noscript>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

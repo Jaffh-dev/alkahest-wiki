@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="progress">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pity, first drops, per player · Alkahest Drops</title>
+    <meta name="description" content="Bad-luck protection (pity), once-per-player drops (first_kill, first_break) and per-player drops in Alkahest Drops.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Pity, first drops, per player</h1>
+<p class="docs-lead">
+    Three ways to make drops fair for each player: <code>pity</code> guarantees a rare drop after a run of bad luck,
+    <code>first_kill</code> / <code>first_break</code> give a drop once, and <code>per_player</code> gives every attacker
+    their own roll.
+</p>
+
+<h2>pity</h2>
+<p>After <code>pity</code> misses in a row, the roll that reaches the number is forced to drop. Each player has their own
+    counter per drop; any drop resets it.</p>
+<pre><code data-lang="json">{
+  "item": "minecraft:nether_star",
+  "chance": 0.01,
+  "count": { "min": 1, "max": 1 },
+  "drop_behavior": { "type": "uniform" },
+  "id": "rare_star",
+  "pity": 50
+}</code></pre>
+<p>1% per kill, and never more than 50 kills without one: the 50th kill after 49 misses always drops.</p>
+<ul>
+    <li><code>pity</code> is an integer of at least 1.</li>
+    <li>A pity drop with <code>"chance": 0</code> drops exactly every N kills.</li>
+    <li>A forced drop gives at least 1 item, rolled with the drop's behavior.</li>
+    <li>A drop that can never miss (chance 1, <code>uniform</code>, count min ≥ 1) gets a warning: pity has no effect.</li>
+    <li>Pity needs a player: it is not counted for kills without one, and not on <code>lightning</code> or
+        <code>periodic</code> drops (warning).</li>
+</ul>
+
+<h2>first_kill and first_break</h2>
+<p>The drop happens once per player, the first time, ignoring its chance. <code>first_kill</code> in mob files,
+    <code>first_break</code> in block files.</p>
+<pre data-title="data/mypack/mob_drops/wither_trophy.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:wither",
+  "drops": [
+    {
+      "item": "minecraft:beacon",
+      "chance": 1,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "id": "first_wither_beacon",
+      "first_kill": true
+    }
+  ]
+}</code></pre>
+<ul>
+    <li>With <code>first_kill</code>, <code>pity</code> is ignored (warning).</li>
+    <li>The other format's key (<code>first_break</code> in a mob file) is ignored with a warning naming the right one.</li>
+    <li><code>first_kill</code> on <code>lightning</code> or <code>periodic</code> drops is an error: there is no player.</li>
+</ul>
+
+<h2>per_player</h2>
+<p>Mobs only. Every player who damaged the mob gets their own roll, with their own pity, first-kill progress and weapon
+    enchantments. Each drop is locked to its owner: only they can pick it up.</p>
+<pre><code data-lang="json">{
+  "item": "minecraft:heart_of_the_sea",
+  "chance": 0.25,
+  "count": { "min": 1, "max": 1 },
+  "drop_behavior": { "type": "uniform" },
+  "per_player": true
+}</code></pre>
+<p>If no attacker is online, the drop gets one shared, unlocked roll like a normal drop. <code>per_player</code> is
+    ignored (warning) in block files, on experience drops, and on triggers other than death.</p>
+
+<h2>id: keeping progress stable</h2>
+<p>Progress is saved per player under a key. With an <code>id</code>, the key is
+    <code>mob:&lt;file id&gt;@&lt;id&gt;</code> (or <code>block:...</code>). Without it, the drop's position in the list is
+    used (<code>mob:&lt;file id&gt;#&lt;index&gt;</code>), so inserting a drop above it changes the key and loses the
+    progress.</p>
+<ul>
+    <li>Give every pity or first-drop drop an <code>id</code>.</li>
+    <li>Allowed characters: <code>a-z 0-9 _ . / -</code>. Unique within the file.</li>
+    <li>An <code>id</code> on a drop without <code>pity</code> or <code>first_kill</code> / <code>first_break</code> has no
+        effect (warning).</li>
+</ul>
+
+<h2>Where progress lives</h2>
+<ul>
+    <li>Saved with the player, kept through death, dimension changes and relogs.</li>
+    <li>Machines' fake players never get progress.</li>
+    <li>Progress of drops that no longer exist is cleaned up on login and <code>/reload</code>. Drops of a file that was
+        skipped by an error keep their progress, so a typo does not wipe it.</li>
+    <li>Reset it with <code>/alkdrops reset &lt;player&gt; [first | pity] [entities | blocks | &lt;target&gt;]</code>.
+        See <a href="commands.html#reset">Commands</a>.</li>
+</ul>
+<div class="callout callout--warn">
+    <span class="callout__title">Disabling a datapack</span>
+    <p>If a datapack is disabled and the world reloads, its players' progress is cleaned up with it.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

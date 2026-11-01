@@ -1,0 +1,164 @@
+/* Home page: hero and the grid of mod cards. */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    background:
+        radial-gradient(60% 120% at 85% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+        radial-gradient(50% 90% at 0% 100%, color-mix(in srgb, var(--accent) 8%, transparent), transparent 70%);
+}
+
+.hero__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 72px 16px 64px;
+}
+
+.hero__eyebrow {
+    margin: 0 0 10px;
+    color: var(--accent-strong);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.hero__title {
+    margin: 0 0 16px;
+    font-size: clamp(2.3rem, 6vw, 3.6rem);
+    letter-spacing: -0.03em;
+}
+
+.hero__lead {
+    max-width: 620px;
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.15rem;
+}
+
+.mods__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 16px 72px;
+}
+
+.mods__title {
+    margin: 0 0 20px;
+    font-size: 1.3rem;
+}
+
+.mod-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.mod-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+.mod-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.mod-card__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mod-card__icon {
+    width: 56px;
+    height: 56px;
+    flex: none;
+    border-radius: 12px;
+}
+
+.mod-card__name {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+/* The whole card opens the mod page; the buttons below stay clickable above that link. */
+.mod-card__name a {
+    color: var(--text);
+    text-decoration: none;
+}
+
+.mod-card__name a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius);
+}
+
+.mod-card__tagline {
+    margin: 2px 0 0;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+}
+
+.mod-card__description {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.mod-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.mod-card__actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+.mod-card__actions .button {
+    padding: 8px 14px;
+    font-size: 0.9rem;
+}
+
+.mod-card--placeholder {
+    justify-content: center;
+    align-items: center;
+    min-height: 220px;
+    border-style: dashed;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.mod-card--placeholder:hover {
+    transform: none;
+    border-color: var(--border-strong);
+}
+
+@media (max-width: 400px) {
+    .mod-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mod-card {
+        transition: none;
+    }
+}

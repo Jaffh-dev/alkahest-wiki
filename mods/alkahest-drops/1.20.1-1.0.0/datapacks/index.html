@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="index">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Getting started · Alkahest Drops</title>
+    <meta name="description" content="Make your first Alkahest Drops datapack: folder layout, pack.mcmeta, a first drop file, reloading and checking it.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Getting started</h1>
+<p class="docs-lead">
+    Alkahest Drops reads JSON files from datapacks and changes what mobs and blocks drop. This page builds a working
+    datapack in five minutes: a zombie that sometimes drops a diamond.
+</p>
+
+<div class="callout callout--tip">
+    <span class="callout__title">Requirements</span>
+    <p>Minecraft 1.20.1 with Forge 47.4 or newer, and Alkahest Drops installed on the server (in singleplayer, the
+        game is the server). JEI is optional.</p>
+</div>
+
+<h2>Folder layout</h2>
+<p>
+    A datapack is a folder (or a zip) inside your world's <code>datapacks</code> folder. Alkahest Drops reads two
+    folders inside each namespace:
+</p>
+<ul>
+    <li><code>data/&lt;namespace&gt;/mob_drops/</code>: files about mobs.</li>
+    <li><code>data/&lt;namespace&gt;/block_drops/</code>: files about blocks.</li>
+</ul>
+<p>Subfolders are allowed. The file id is the namespace plus the path, such as <code>mypack:zombie_diamond</code>.</p>
+<pre class="tree" data-title="saves/My World/datapacks/">my_drops/
+├── pack.mcmeta
+└── data/
+    └── mypack/
+        ├── mob_drops/
+        │   └── zombie_diamond.json
+        └── block_drops/
+            └── stone_flint.json</pre>
+
+<h2>pack.mcmeta</h2>
+<p>Minecraft 1.20.1 uses pack format <code>15</code>.</p>
+<pre data-title="my_drops/pack.mcmeta"><code data-lang="json">{
+  "pack": {
+    "pack_format": 15,
+    "description": "My drops"
+  }
+}</code></pre>
+
+<h2>A first drop file</h2>
+<p>
+    This file gives zombies a 2% chance to drop one diamond. Every key shown here is required: Alkahest Drops has no
+    hidden defaults, so a file always says exactly what it does.
+</p>
+<pre data-title="data/mypack/mob_drops/zombie_diamond.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:zombie",
+  "drops": [
+    {
+      "item": "minecraft:diamond",
+      "chance": 0.02,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" }
+    }
+  ]
+}</code></pre>
+<dl>
+    <dt><code>version</code></dt>
+    <dd>The file format version. Always <code>1</code> for now.</dd>
+    <dt><code>entity</code></dt>
+    <dd>Which mob the file is about. Block files use <code>block</code> instead.</dd>
+    <dt><code>drops</code></dt>
+    <dd>The drops to add. Each one needs <code>item</code>, <code>chance</code> (0 to 1), <code>count</code> and
+        <code>drop_behavior</code>.</dd>
+</dl>
+<p>The same idea for a block: stone gets a 10% chance of 1 to 2 flint.</p>
+<pre data-title="data/mypack/block_drops/stone_flint.json"><code data-lang="json">{
+  "version": 1,
+  "block": "minecraft:stone",
+  "drops": [
+    {
+      "item": "minecraft:flint",
+      "chance": 0.1,
+      "count": { "min": 1, "max": 2 },
+      "drop_behavior": { "type": "uniform" }
+    }
+  ]
+}</code></pre>
+<p>
+    Drops added to a mob or block come <strong>on top of</strong> its normal loot. To take something away, use a
+    <a href="removal-files.html">removal file</a>.
+</p>
+
+<h2>Load and check it</h2>
+<ol class="steps">
+    <li>Put the folder in <code>saves/&lt;world&gt;/datapacks/</code> (or <code>world/datapacks/</code> on a server).</li>
+    <li>Run <code>/reload</code> in game. Alkahest Drops reads every file again.</li>
+    <li>Run <code>/alkdrops validate</code>. It lists every error and warning found in the files; a clean pack shows
+        none. Problems are also written to the server log.</li>
+    <li>Run <code>/alkdrops simulate entity minecraft:zombie 1000</code> to roll 1000 zombie kills without killing
+        anything. About 20 diamonds should show up.</li>
+</ol>
+<pre><code data-lang="command">/reload
+/alkdrops validate
+/alkdrops simulate entity minecraft:zombie 1000</code></pre>
+
+<div class="callout">
+    <span class="callout__title">A broken file never crashes the game</span>
+    <p>A file with an error is skipped (or only the bad drop is skipped) and the problem is reported. Everything else
+        keeps working. See <a href="validation.html">Validation and limits</a>.</p>
+</div>
+
+<h2>Where to go next</h2>
+<div class="link-cards">
+    <a class="link-card" href="drop-files.html"><strong>Drop files</strong><span>Every key of a drop, explained.</span></a>
+    <a class="link-card" href="removal-files.html"><strong>Removal files</strong><span>Remove or replace existing drops.</span></a>
+    <a class="link-card" href="behaviors.html"><strong>Drop behaviors</strong><span>Rolls, health and hardness scaling.</span></a>
+    <a class="link-card" href="recipes.html"><strong>Recipes</strong><span>Ready-made files for common tasks.</span></a>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

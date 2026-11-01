@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="developers" data-page="read-api">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Read API · Alkahest Drops</title>
+    <meta name="description" content="AlkahestDropsApi.getMobDrops and getBlockDrops: read what Alkahest Drops files add to and remove from a mob or block.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Read API</h1>
+<p class="docs-lead">
+    Read what the loaded drop and removal files do to a mob or block: for wiki mods, quest mods, recipe viewers and
+    server tools.
+</p>
+
+<h2>Methods</h2>
+<pre><code data-lang="java">TargetDrops AlkahestDropsApi.getMobDrops(EntityType&lt;?&gt; type, DropTrigger trigger)
+TargetDrops AlkahestDropsApi.getBlockDrops(Block block)</code></pre>
+<ul>
+    <li>Files that name the target by id, tag, <code>mod:*</code> or <code>*</code> are all included.</li>
+    <li><strong>Server thread only.</strong> Any other thread throws <code>IllegalStateException</code>.</li>
+    <li>Returns <code>TargetDrops.EMPTY</code> when no server is running or before the files are loaded.</li>
+    <li>Built on each call (it is not meant for every tick). Cache results and refresh them on
+        <a href="events.html#dropfilesloadedevent"><code>DropFilesLoadedEvent</code></a>.</li>
+</ul>
+
+<h2>TargetDrops</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Member</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><code>drops()</code></td><td><code>List&lt;AddedDrop&gt;</code>: drops the files add, without those that removal files of other namespaces always remove (as in game). Immutable.</td></tr>
+        <tr><td><code>removals()</code></td><td><code>List&lt;DropRemoval&gt;</code>: removal entries that apply, conditional or not. Immutable.</td></tr>
+        <tr><td><code>isEmpty()</code></td><td>True when nothing is added or removed.</td></tr>
+        <tr><td><code>EMPTY</code></td><td>Constant with no drops and no removals.</td></tr>
+    </tbody>
+</table>
+</div>
+<p>Conditional removals are not applied to <code>drops()</code>; they are listed in <code>removals()</code>.</p>
+
+<h2>AddedDrop</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Component</th><th>Type</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><code>fileId</code></td><td><code>ResourceLocation</code></td><td>Drop file id, such as <code>mypack:zombie</code>.</td></tr>
+        <tr><td><code>dropKey</code></td><td><code>String</code></td><td>Same key as <code>OnDropEvent.getDropKey()</code> and the progress API.</td></tr>
+        <tr><td><code>item</code></td><td><code>@Nullable Item</code></td><td>Dropped item; null for experience.</td></tr>
+        <tr><td><code>chance</code></td><td><code>double</code></td><td>Base chance 0–1, before enchantment bonuses.</td></tr>
+        <tr><td><code>minCount</code>, <code>maxCount</code></td><td><code>int</code></td><td>Base count range (or experience). Roll-based and scaled behaviors may give other amounts.</td></tr>
+        <tr><td><code>trigger</code></td><td><code>DropTrigger</code></td><td>What makes it drop.</td></tr>
+        <tr><td><code>isConditional</code></td><td><code>boolean</code></td><td>Loot conditions (file or drop) decide whether it drops.</td></tr>
+        <tr><td><code>hasEnchantBonus</code></td><td><code>boolean</code></td><td>An enchantment raises chance, count or rolls.</td></tr>
+        <tr><td><code>pity</code></td><td><code>int</code></td><td>Forced after that many misses; 0 for none.</td></tr>
+        <tr><td><code>isFirstDrop</code></td><td><code>boolean</code></td><td><code>first_kill</code> / <code>first_break</code>.</td></tr>
+    </tbody>
+</table>
+</div>
+<p><code>isExperience()</code> is true when <code>item()</code> is null.</p>
+
+<h2>DropRemoval</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Component</th><th>Type</th><th>Meaning</th></tr></thead>
+    <tbody>
+        <tr><td><code>fileId</code></td><td><code>ResourceLocation</code></td><td>Removal file id.</td></tr>
+        <tr><td><code>items</code></td><td><code>@Nullable String</code></td><td>As written: an item id, <code>#tag</code> or <code>*</code>; null for experience.</td></tr>
+        <tr><td><code>trigger</code></td><td><code>DropTrigger</code></td><td>Trigger whose drops it removes.</td></tr>
+        <tr><td><code>isConditional</code></td><td><code>boolean</code></td><td>Loot conditions decide whether it removes.</td></tr>
+    </tbody>
+</table>
+</div>
+<p><code>isExperience()</code> is true when <code>items()</code> is null. <code>removes(Item)</code> tells whether the
+    entry names the item, one of its tags (as bound now) or <code>*</code>.</p>
+
+<h2>DropTrigger</h2>
+<p><code>DEATH</code>, <code>SHEAR</code>, <code>HIT</code>, <code>LIGHTNING</code>, <code>PERIODIC</code>. Blocks only use
+    <code>DEATH</code> (a break).</p>
+<ul>
+    <li><code>id()</code>: the id as written in files, such as <code>"shear"</code>.</li>
+    <li><code>fromId(String)</code>: <code>Optional&lt;DropTrigger&gt;</code>.</li>
+    <li><code>hasPlayer()</code>: true for death, shear and hit.</li>
+</ul>
+
+<h2>Example: list zombie drops in a command</h2>
+<pre><code data-lang="java">TargetDrops drops = AlkahestDropsApi.getMobDrops(EntityType.ZOMBIE, DropTrigger.DEATH);
+for (AddedDrop drop : drops.drops()) {
+    String what = drop.isExperience() ? "experience" : String.valueOf(ForgeRegistries.ITEMS.getKey(drop.item()));
+    source.sendSystemMessage(Component.literal(
+            what + " " + Math.round(drop.chance() * 100) + "% x" + drop.minCount() + "-" + drop.maxCount()));
+}
+boolean noFlesh = drops.removals().stream()
+        .anyMatch(removal -&gt; !removal.isConditional() &amp;&amp; removal.removes(Items.ROTTEN_FLESH));</code></pre>
+
+<div class="callout">
+    <span class="callout__title">Client side</span>
+    <p>The read API works on the server (singleplayer included). A client-side read API for recipe viewers on
+        multiplayer servers may come in a 1.x version.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

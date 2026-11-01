@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="developers" data-page="progress-api">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Progress API · Alkahest Drops</title>
+    <meta name="description" content="Read and reset a player's Alkahest Drops pity misses and one-time drops from another mod.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Progress API</h1>
+<p class="docs-lead">
+    Read and reset a player's drop progress: pity misses and one-time drops (<code>first_kill</code> and
+    <code>first_break</code>). Useful for quest rewards, server tools and "reroll" items.
+</p>
+
+<h2>Methods</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+    <tbody>
+        <tr><td><code>getPityMisses(Player, String dropKey)</code></td><td><code>int</code>: misses in a row since the drop last dropped.</td></tr>
+        <tr><td><code>hasReceivedFirstDrop(Player, String dropKey)</code></td><td><code>boolean</code>: the one-time drop already happened.</td></tr>
+        <tr><td><code>resetPity(Player, String dropKey)</code></td><td><code>boolean</code>: there were misses to clear.</td></tr>
+        <tr><td><code>resetFirstDrop(Player, String dropKey)</code></td><td><code>boolean</code>: the player had received it.</td></tr>
+        <tr><td><code>resetAllPity(Player)</code></td><td><code>int</code>: counters cleared.</td></tr>
+        <tr><td><code>resetAllFirstDrops(Player)</code></td><td><code>int</code>: one-time drops forgotten (mobs and blocks).</td></tr>
+    </tbody>
+</table>
+</div>
+<ul>
+    <li>All static on <code>AlkahestDropsApi</code>, server thread only (<code>IllegalStateException</code> elsewhere).</li>
+    <li>Pity and first-drop resets are separate, like <code>/alkdrops reset &lt;player&gt; pity | first</code>: resetting
+        one never touches the other.</li>
+    <li>Machines' fake players have no progress: reads return 0 / false and resets clear nothing.</li>
+</ul>
+
+<h2>Drop keys</h2>
+<p>Progress is stored per drop key, the same key as <code>AddedDrop.dropKey()</code> and
+    <code>OnDropEvent.getDropKey()</code>:</p>
+<ul>
+    <li><code>mob:&lt;file id&gt;@&lt;id&gt;</code> or <code>block:&lt;file id&gt;@&lt;id&gt;</code> for drops with an
+        <code>id</code>, such as <code>mob:mypack:wither_trophy@first_wither_beacon</code>;</li>
+    <li><code>mob:&lt;file id&gt;#&lt;index&gt;</code> otherwise (the drop's position in <code>drops</code>).</li>
+</ul>
+<p>Get keys from the <a href="read-api.html">read API</a> rather than building them by hand.</p>
+<p>The forced roll happens when the misses reach <code>AddedDrop.pity()</code>, so at most
+    <code>pity - misses</code> rolls are left.</p>
+
+<h2>Example: a "lucky charm" that shows the countdown</h2>
+<pre><code data-lang="java">TargetDrops drops = AlkahestDropsApi.getMobDrops(EntityType.ENDERMAN, DropTrigger.DEATH);
+for (AddedDrop drop : drops.drops()) {
+    if (drop.pity() == 0) continue;
+    int misses = AlkahestDropsApi.getPityMisses(player, drop.dropKey());
+    int left = drop.pity() - misses;
+    player.displayClientMessage(Component.literal("Guaranteed within " + left + " kills"), true);
+}</code></pre>
+
+<h2>Example: quest reward that resets a trophy</h2>
+<pre><code data-lang="java">boolean wasClaimed = AlkahestDropsApi.resetFirstDrop(player, "mob:mypack:wither_trophy@first_wither_beacon");</code></pre>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

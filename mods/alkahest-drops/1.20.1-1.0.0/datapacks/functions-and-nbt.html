@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="functions-and-nbt">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Loot functions and NBT · Alkahest Drops</title>
+    <meta name="description" content="Give Alkahest Drops drops NBT, names, enchantments and smelting with nbt and vanilla loot functions.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Loot functions and NBT</h1>
+<p class="docs-lead">
+    <code>nbt</code> sets item data directly. <code>functions</code> runs vanilla loot functions on the dropped stack:
+    names, enchantments, smelting, and anything other mods register.
+</p>
+
+<h2>nbt</h2>
+<p>SNBT text, the same format as <code>/give</code>. Quotes inside the JSON string are escaped with <code>\"</code>.</p>
+<pre><code data-lang="json">{
+  "item": "minecraft:diamond_sword",
+  "chance": 0.01,
+  "count": { "min": 1, "max": 1 },
+  "drop_behavior": { "type": "uniform" },
+  "nbt": "{display:{Name:'{\"text\":\"Zombie Slayer\",\"color\":\"gold\"}'},Damage:100}"
+}</code></pre>
+<p>Invalid SNBT is an error and the drop is skipped.</p>
+
+<h2>functions</h2>
+<p>An array of loot functions, in the same format as loot tables. They run in order, after the count and
+    <code>nbt</code> are applied. Functions can have their own <code>conditions</code>.</p>
+<pre data-title="data/mypack/block_drops/copper_ore.json"><code data-lang="json">{
+  "version": 1,
+  "block": "minecraft:copper_ore",
+  "drops": [
+    {
+      "item": "minecraft:raw_copper",
+      "chance": 1,
+      "count": { "min": 2, "max": 2 },
+      "drop_behavior": { "type": "uniform" },
+      "functions": [
+        { "function": "minecraft:furnace_smelt",
+          "conditions": [
+            { "condition": "minecraft:match_tool", "predicate": { "items": [ "minecraft:diamond_pickaxe" ] } }
+          ] }
+      ]
+    },
+    {
+      "item": "minecraft:book",
+      "chance": 0.05,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" },
+      "functions": [
+        { "function": "minecraft:enchant_with_levels", "levels": 30, "treasure": false },
+        { "function": "minecraft:set_name", "name": { "text": "Copper Tome", "color": "gold", "italic": false } }
+      ]
+    }
+  ]
+}</code></pre>
+<p>Raw copper comes out smelted with a diamond pickaxe, and a rare enchanted book named "Copper Tome" can drop.</p>
+
+<h3>Useful functions</h3>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Function</th><th>Effect</th></tr></thead>
+    <tbody>
+        <tr><td><code>minecraft:enchant_randomly</code></td><td>One random enchantment.</td></tr>
+        <tr><td><code>minecraft:enchant_with_levels</code></td><td>Enchants as an enchanting table would at that level.</td></tr>
+        <tr><td><code>minecraft:set_name</code>, <code>set_lore</code></td><td>Name and lore.</td></tr>
+        <tr><td><code>minecraft:furnace_smelt</code></td><td>Smelts the item; with an <code>entity_properties</code> fire condition, "cooked when the mob burns".</td></tr>
+        <tr><td><code>minecraft:set_damage</code></td><td>Tool durability.</td></tr>
+        <tr><td><code>minecraft:set_nbt</code></td><td>Merges NBT.</td></tr>
+    </tbody>
+</table>
+</div>
+
+<h2>Rules and warnings</h2>
+<ul>
+    <li>An invalid function is an error: the drop is skipped.</li>
+    <li>A function that empties the stack drops nothing.</li>
+    <li>Removal files match the drop's <code>item</code>, not what a function turns it into.</li>
+    <li>A function or its condition that reads loot data Alkahest Drops never provides gets a warning.</li>
+    <li><code>minecraft:set_count</code> without <code>"add": true</code> replaces the rolled count: warning.</li>
+    <li><code>looting_enchant</code> or <code>apply_bonus</code> for an enchantment that is also in the drop's
+        <code>enchant_bonus</code> gives both bonuses: warning.</li>
+    <li>On experience drops, <code>nbt</code> and <code>functions</code> are ignored with a warning.</li>
+</ul>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>

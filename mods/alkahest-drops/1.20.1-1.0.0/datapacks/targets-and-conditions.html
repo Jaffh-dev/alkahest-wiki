@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" data-root="../../../../" data-mod="alkahest-drops" data-version="1.20.1-1.0.0" data-section="datapacks" data-page="targets-and-conditions">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Targets and conditions · Alkahest Drops</title>
+    <meta name="description" content="Target one mob or block, a tag, a whole mod or everything, and gate drops with global and local loot conditions.">
+    <link rel="icon" href="../../../../assets/img/mods/alkahest-drops.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="../../../../assets/css/global.css">
+    <link rel="stylesheet" href="../../../../assets/css/docs.css">
+    <script src="../../../../assets/js/core/theme.js"></script>
+    <script src="../../../../assets/js/data/mods.js" defer></script>
+    <script src="../nav.js" defer></script>
+    <script src="../../../../assets/js/core/site.js" defer></script>
+    <script src="../../../../assets/js/core/versions.js" defer></script>
+    <script src="../../../../assets/js/core/docs.js" defer></script>
+    <script src="../../../../assets/js/pages/doc-page.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header" data-site-header></header>
+    <noscript><p class="noscript-warning">This site needs JavaScript for its menus; the page content below still works.</p></noscript>
+
+    <div class="docs-layout">
+        <aside class="docs-sidebar" id="docs-sidebar" data-docs-sidebar></aside>
+
+        <main class="docs-main" id="content">
+            <article class="docs-content">
+<h1>Targets and conditions</h1>
+<p class="docs-lead">
+    The target (<code>entity</code> or <code>block</code>) says which mobs or blocks a file is about. Conditions say
+    when its drops happen.
+</p>
+
+<h2>Targets</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Value</th><th>Matches</th></tr></thead>
+    <tbody>
+        <tr><td><code>"minecraft:zombie"</code></td><td>One mob or block.</td></tr>
+        <tr><td><code>"#minecraft:skeletons"</code></td><td>Every mob in an entity type tag (or block in a block tag).</td></tr>
+        <tr><td><code>"twilightforest:*"</code></td><td>Every mob or block of one namespace.</td></tr>
+        <tr><td><code>"*"</code></td><td>Every mob or block. Never players.</td></tr>
+    </tbody>
+</table>
+</div>
+<ul>
+    <li>Several files may target the same mob; their drops all apply.</li>
+    <li>An unknown id, or a namespace with nothing registered, skips the file with a warning: the mod may simply not be
+        installed.</li>
+    <li>Tags are read when the drop happens, so tags from any datapack work.</li>
+    <li>Use the right key: <code>entity</code> in <code>mob_drops/</code>, <code>block</code> in
+        <code>block_drops/</code>. The wrong one is an error that names the right one.</li>
+</ul>
+
+<h2>Global and local conditions</h2>
+<p>Conditions are vanilla loot conditions (the same as in loot tables and predicates). Conditions of other mods work too.
+    They can sit at two levels, in both drop files and removal files:</p>
+<dl>
+    <dt>Global: the file's top-level <code>conditions</code></dt>
+    <dd>Tested once per kill or break. When one fails, the whole file is skipped.</dd>
+    <dt>Local: an entry's own <code>conditions</code></dt>
+    <dd>Only for that drop or removal entry.</dd>
+</dl>
+<p>An entry applies only when the global <strong>and</strong> the local conditions all pass, like a pool and an entry
+    of a vanilla loot table.</p>
+
+<pre data-title="data/mypack/mob_drops/skeleton_player_kills.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "#minecraft:skeletons",
+  "conditions": [
+    { "condition": "minecraft:killed_by_player" }
+  ],
+  "drops": [
+    {
+      "item": "minecraft:bone_block",
+      "chance": 0.1,
+      "count": { "min": 1, "max": 1 },
+      "drop_behavior": { "type": "uniform" }
+    },
+    {
+      "item": "minecraft:arrow",
+      "chance": 1,
+      "count": { "min": 2, "max": 4 },
+      "drop_behavior": { "type": "uniform" },
+      "conditions": [
+        { "condition": "minecraft:entity_properties", "entity": "killer",
+          "predicate": { "flags": { "is_sneaking": true } } }
+      ]
+    }
+  ]
+}</code></pre>
+<p>Both drops need a player kill (global). The arrows also need the player to sneak (local).</p>
+
+<h2>Useful conditions</h2>
+<div class="table-wrap">
+<table>
+    <thead><tr><th>Goal</th><th>Condition</th></tr></thead>
+    <tbody>
+        <tr><td>A player killed the mob</td><td><code>{ "condition": "minecraft:killed_by_player" }</code></td></tr>
+        <tr><td>A real player (not a machine) killed it</td><td><code>{ "condition": "alkahestdrops:killed_by_real_player" }</code></td></tr>
+        <tr><td>A real player broke the block</td><td><code>{ "condition": "alkahestdrops:broken_by_real_player" }</code></td></tr>
+        <tr><td>The mob was on fire</td><td><code>entity_properties</code>, <code>"entity": "this"</code>, <code>flags.is_on_fire</code></td></tr>
+        <tr><td>The killer sneaked</td><td><code>entity_properties</code>, <code>"entity": "killer"</code>, <code>flags.is_sneaking</code></td></tr>
+        <tr><td>Silk Touch tool (blocks)</td><td><code>match_tool</code> with an enchantment predicate</td></tr>
+        <tr><td>Random extra gate</td><td><code>{ "condition": "minecraft:random_chance", "chance": 0.5 }</code></td></tr>
+        <tr><td>The opposite of a condition</td><td><code>{ "condition": "minecraft:inverted", "term": { ... } }</code></td></tr>
+    </tbody>
+</table>
+</div>
+
+<h3>Real players only</h3>
+<p>
+    Machine mods (mob grinders, block breakers) use "fake players". Vanilla's <code>killed_by_player</code> passes for
+    them. Alkahest Drops adds two conditions that do not:
+</p>
+<ul>
+    <li><code>alkahestdrops:killed_by_real_player</code> for mob files,</li>
+    <li><code>alkahestdrops:broken_by_real_player</code> for block files.</li>
+</ul>
+<p>They work in any loot table too, not only Alkahest Drops files. Fake players also never get pity or first-drop
+    progress.</p>
+
+<h3>Silk Touch example (blocks)</h3>
+<pre data-title="data/mypack/block_drops/glass_silk.json"><code data-lang="json">{
+  "version": 1,
+  "block": "minecraft:glass",
+  "drops": [
+    {
+      "item": "minecraft:glass_pane",
+      "chance": 1,
+      "count": { "min": 2, "max": 2 },
+      "drop_behavior": { "type": "uniform" },
+      "conditions": [
+        { "condition": "minecraft:match_tool",
+          "predicate": { "enchantments": [ { "enchantment": "minecraft:silk_touch", "levels": { "min": 1 } } ] } }
+      ]
+    }
+  ]
+}</code></pre>
+
+<div class="callout">
+    <span class="callout__title">Block drops need a harvesting tool</span>
+    <p>As in vanilla, a block only drops (and gives experience) when broken with a tool that can harvest it. Stone
+        broken by hand drops nothing, Alkahest Drops drops included.</p>
+</div>
+            </article>
+            <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>
+        </main>
+
+        <aside class="docs-toc" data-docs-toc></aside>
+    </div>
+
+    <footer class="site-footer" data-site-footer></footer>
+</body>
+</html>
