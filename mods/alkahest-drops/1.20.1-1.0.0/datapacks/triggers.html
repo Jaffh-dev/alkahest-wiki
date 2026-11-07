@@ -143,6 +143,14 @@
     trigger. On non-death triggers it removes only Alkahest Drops drops of other namespaces; the game's own drops
     (sheep wool, chicken eggs) are never touched. A top-level <code>on</code> in a drop file is ignored with a warning:
     set it per drop.</p>
+<p>For example, if another datapack or a mod makes sheep drop string when sheared, this file in your own namespace
+    removes it. Sheep still drop their string on death, and the wool the game drops when shearing stays.</p>
+<pre data-title="data/mypack/mob_drops/sheep_no_shear_string.json"><code data-lang="json">{
+  "version": 1,
+  "entity": "minecraft:sheep",
+  "on": "shear",
+  "removals": [ "minecraft:string" ]
+}</code></pre>
 
 <h2>Testing triggers</h2>
 <pre><code data-lang="command">/alkdrops simulate entity minecraft:sheep on shear 100

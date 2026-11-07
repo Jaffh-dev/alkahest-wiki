@@ -38,7 +38,6 @@
     <li>Blocks with no loot table (such as a piston head) get Alkahest Drops drops only when a player breaks them.</li>
     <li>Drops a block creates in its own code, outside its loot table, cannot be removed.</li>
     <li>Experience from blocks needs a player with a harvesting tool: never from explosions or in creative mode.</li>
-    <li>Silk Touch does not stop experience drops on its own; add a <code>match_tool</code> condition.</li>
 </ul>
 
 <h2>Mob drops</h2>
@@ -79,8 +78,13 @@
 
 <h2>Validation</h2>
 <ul>
-    <li>A bonus that raises <code>count.min</code> above <code>count.max</code> at high enchantment levels is not detected;
-        <code>uniform</code> then gives <code>min</code>.</li>
+    <li>Count bonuses are only checked one by one. If <code>bonus_min_per_level</code> grows faster than
+        <code>bonus_max_per_level</code>, a high enchantment level can push <code>count.min</code> above
+        <code>count.max</code>. For example, a count of 1 to 2 with +2 min per Looting level becomes 7 to 2 at Looting
+        III. The file still loads without a warning, and the drop then gives <code>count.min</code> (7) with
+        <code>uniform</code> and the scaled behaviors, or <code>count.max</code> (2) with <code>fixed_rolls</code> and
+        <code>chained_rolls</code>. Give <code>bonus_max_per_level</code> at least the same value as
+        <code>bonus_min_per_level</code> to avoid it.</li>
 </ul>
             </article>
             <nav class="docs-pager" aria-label="Previous and next page" data-docs-pager></nav>

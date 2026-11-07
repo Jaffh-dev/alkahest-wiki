@@ -5,7 +5,7 @@
   "description": "Parts shared by mob_drops and block_drops files. Not a file schema by itself.",
   "definitions": {
     "version": {
-      "description": "File format version. Always 1. A missing or newer version skips the whole file.",
+      "description": "File format version, 1 for this version. A missing or newer version skips the whole file.",
       "const": 1
     },
     "id": {

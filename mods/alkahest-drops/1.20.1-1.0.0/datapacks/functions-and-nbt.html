@@ -36,7 +36,9 @@
 </p>
 
 <h2>nbt</h2>
-<p>SNBT text, the same format as <code>/give</code>. Quotes inside the JSON string are escaped with <code>\"</code>.</p>
+<p>Item NBT, written in one of two ways.</p>
+<h3>SNBT text</h3>
+<p>The same format as <code>/give</code>, inside a JSON string. Quotes inside it are escaped with <code>\"</code>.</p>
 <pre><code data-lang="json">{
   "item": "minecraft:diamond_sword",
   "chance": 0.01,
@@ -44,7 +46,24 @@
   "drop_behavior": { "type": "uniform" },
   "nbt": "{display:{Name:'{\"text\":\"Zombie Slayer\",\"color\":\"gold\"}'},Damage:100}"
 }</code></pre>
-<p>Invalid SNBT is an error and the drop is skipped.</p>
+<h3>JSON object</h3>
+<p>A plain JSON object is read as NBT too, which avoids most of the escaping:</p>
+<pre><code data-lang="json">{
+  "item": "minecraft:diamond_sword",
+  "chance": 0.01,
+  "count": { "min": 1, "max": 1 },
+  "drop_behavior": { "type": "uniform" },
+  "nbt": { "display": { "Name": "{\"text\":\"Zombie Slayer\",\"color\":\"gold\"}" }, "Damage": 100 }
+}</code></pre>
+<div class="callout callout--warn">
+    <span class="callout__title">SNBT and JSON do not give the same item</span>
+    <p>JSON has no NBT number types: whole numbers become ints, decimals become doubles, and <code>true</code> /
+        <code>false</code> become bytes. SNBT can say exactly which type it wants (<code>1b</code>, <code>1s</code>,
+        <code>1.5f</code>). So <code>{Unbreakable:1b}</code> in SNBT and <code>{"Unbreakable": 1}</code> in JSON make
+        items with different NBT, which do not stack with each other or with items made by <code>/give</code>. When the
+        item must match others exactly, use SNBT with the types the game uses.</p>
+</div>
+<p>Invalid NBT is an error and the drop is skipped.</p>
 
 <h2>functions</h2>
 <p>An array of loot functions, in the same format as loot tables. They run in order, after the count and

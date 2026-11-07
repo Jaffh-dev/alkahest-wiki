@@ -104,11 +104,11 @@
 
 <h2>max_health</h2>
 <p>For mobs. The count follows the mob's max health:</p>
-<pre><code>count = clamp( round( multiplier × f(max_health / divisor) ), count.min, count.max )</code></pre>
+<pre><code>count = clamp( round( multiplier × function(max_health / divisor) ), count.min, count.max )</code></pre>
 <pre><code data-lang="json">"count": { "min": 1, "max": 16 },
 "drop_behavior": { "type": "max_health", "function": "log", "multiplier": 3, "divisor": 10 }</code></pre>
 <ul>
-    <li><code>function</code>: <code>linear</code> (f(x) = x) or <code>log</code> (natural log, f(x) = ln x). Optional, default <code>linear</code>.</li>
+    <li><code>function</code>: <code>linear</code> (function(x) = x) or <code>log</code> (natural log, function(x) = ln x). Optional, default <code>linear</code>.</li>
     <li><code>multiplier</code>, <code>divisor</code>: optional, default 1, must be above 0.</li>
     <li><code>count</code> is the clamp: <code>min</code> may be 0, <code>max</code> is the cap.</li>
     <li>With these numbers: zombie (20 health) → 3 × ln 2 ≈ 2.08 → <strong>2</strong>; wither (300) → 3 × ln 30 ≈ 10.2 → <strong>10</strong>.</li>
