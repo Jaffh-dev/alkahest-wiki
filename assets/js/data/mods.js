@@ -21,7 +21,7 @@
                 "Add, remove and tune mob and block drops with JSON files: chances, rolls, enchantment bonuses, " +
                 "bad-luck protection, one-time and per-player drops, triggers beyond death and actions when a drop " +
                 "lands. Checked on load, simulated in game, shown in JEI.",
-            icon: "assets/img/mods/alkahest-drops.svg",
+            icon: "assets/img/mods/alkahest-drops.png",
             path: "mods/alkahest-drops/",
             status: "Released",
             loader: "Forge",
