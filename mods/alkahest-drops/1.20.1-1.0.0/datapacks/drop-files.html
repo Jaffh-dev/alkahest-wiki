@@ -155,8 +155,10 @@
     </div>
     <div class="key">
         <div class="key__head"><span class="key__name">id</span><span class="key__type">string, [a-z0-9_./-]</span><span class="optional">Optional</span></div>
-        <p>A stable name for the drop's progress (pity, first drop), unique in the file. Without it, progress is
-            keyed by the drop's position in the list, so adding a drop above it resets it.</p>
+        <p>A stable name for the drop, unique in the file. It forms the drop's key
+            (<code>mob:&lt;file id&gt;@&lt;id&gt;</code>), which mods see in <code>OnDropEvent</code> and the API, and
+            which stores players' pity and first-drop progress. Without it, the key uses the drop's position in the list,
+            so adding a drop above it changes the key and resets that progress.</p>
     </div>
     <div class="key">
         <div class="key__head"><span class="key__name">on</span><span class="key__type">string</span><span class="optional">Optional · mobs</span></div>

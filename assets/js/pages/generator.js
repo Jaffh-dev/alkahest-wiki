@@ -15,6 +15,10 @@
     if (!root) return;
 
     var IDS = (A.ids && A.ids["1.20.1"]) || {};
+    /** Element id of a shared <datalist> of vanilla ids (assets/js/core/id-suggestions.js). */
+    function suggest(name) {
+        return A.idSuggestions ? A.idSuggestions.listId(name) : null;
+    }
     var PACK_FORMAT = 15;
     var DEFAULT_LIMIT = 1024;
     var ID_RE = /^(?:[a-z0-9_.-]+:)?[a-z0-9_./-]+$/;
@@ -77,27 +81,6 @@
                 return word.charAt(0).toUpperCase() + word.slice(1);
             })
             .join(" ");
-    }
-
-    function buildDatalists() {
-        var lists = {
-            "gen-items": IDS.items,
-            "gen-removal-items": ["*"].concat(IDS.items || [], IDS.itemTags || []),
-            "gen-mobs": ["*", "minecraft:*"].concat(IDS.mobs || [], IDS.entityTags || []),
-            "gen-blocks": ["*", "minecraft:*"].concat(IDS.blocks || [], IDS.blockTags || []),
-            "gen-enchantments": IDS.enchantments,
-            "gen-mob-ids": IDS.mobs,
-            "gen-block-ids": IDS.blocks
-        };
-        var host = el("div", { hidden: true });
-        Object.keys(lists).forEach(function (id) {
-            var list = el("datalist", { id: id });
-            (lists[id] || []).forEach(function (value) {
-                list.appendChild(el("option", { value: value === "*" || value === "minecraft:*" ? value : expandId(value) }));
-            });
-            host.appendChild(list);
-        });
-        document.body.appendChild(host);
     }
 
     /* ======================================================================
@@ -588,7 +571,6 @@
         }
         if (drop.id !== undefined) {
             if (typeof drop.id !== "string" || !PROGRESS_ID_RE.test(drop.id)) issues.push(issue("error", p + ".id", "use only a-z, 0-9 and _ . / -"));
-            else if (drop.pity === undefined && !isOneTime) issues.push(issue("warning", p + ".id", "no effect without pity or a one-time drop"));
         }
 
         /* Trigger */
@@ -1030,7 +1012,7 @@
             el("div", { className: "gen-row" }, [kindToggle, typeToggle]),
             el("div", { className: "gen-grid" }, [
                 field(state.kind === "block" ? "Block (block)" : "Mob (entity)",
-                    textInput(["file", key], file[key], { list: state.kind === "block" ? "gen-blocks" : "gen-mobs", placeholder: state.kind === "block" ? "minecraft:stone" : "minecraft:zombie" }),
+                    textInput(["file", key], file[key], { list: state.kind === "block" ? suggest("blocks") : suggest("mobs"), placeholder: state.kind === "block" ? "minecraft:stone" : "minecraft:zombie" }),
                     "An id, #tag, mod:* or *"),
                 field("Namespace", el("input", { type: "text", "data-meta": "namespace", value: state.namespace, spellcheck: "false", autocomplete: "off" }), "Your pack's folder under data/"),
                 field("File name", el("input", { type: "text", "data-meta": "name", value: state.name, spellcheck: "false", autocomplete: "off" }), "Without .json")
@@ -1073,7 +1055,7 @@
         var onp = ep.concat(["on_enchant"]);
         var rows = [
             el("div", { className: "gen-enchant__head" }, [
-                field("Enchantment", textInput(ep.concat(["enchant"]), entry && entry.enchant, { list: "gen-enchantments", placeholder: "minecraft:looting" })),
+                field("Enchantment", textInput(ep.concat(["enchant"]), entry && entry.enchant, { list: suggest("enchantments"), placeholder: "minecraft:looting" })),
                 button("Remove", "remove-item", { target: pathKey(ep) }, "gen-button--quiet")
             ]),
             el("div", { className: "gen-grid gen-grid--tight" }, [
@@ -1149,7 +1131,7 @@
 
         var what = el("div", { className: "gen-grid" }, [
             field("Drops", select(["meta", "what", index], isExperience ? "experience" : "item", [["item", "an item"], ["experience", "experience"]], { "data-action-change": "set-what", "data-index": String(index) })),
-            isExperience ? null : field("Item", textInput(path.concat(["item"]), drop.item, { list: "gen-items", placeholder: "minecraft:diamond" })),
+            isExperience ? null : field("Item", textInput(path.concat(["item"]), drop.item, { list: suggest("items"), placeholder: "minecraft:diamond" })),
             field("Chance (%)", numberInput(path.concat(["chance"]), drop.chance, "percent", { min: "0", max: "100" })),
             field(isExperience ? "Experience min" : "Count min", numberInput(path.concat(["count", "min"]), drop.count && drop.count.min, "int", { min: "0" })),
             field(isExperience ? "Experience max" : "Count max", numberInput(path.concat(["count", "max"]), drop.count && drop.count.max, "int", { min: "0" }))
@@ -1188,7 +1170,7 @@
 
         var tracking = [
             field("Pity (misses)", numberInput(path.concat(["pity"]), drop.pity, "int", { min: "1", placeholder: "off" }), "Forced on this roll"),
-            field("Progress id", textInput(path.concat(["id"]), drop.id, { placeholder: "rare_star" }), "Keeps progress when the file changes")
+            field("Drop id", textInput(path.concat(["id"]), drop.id, { placeholder: "rare_star" }), "Names the drop for mods; keeps its progress")
         ];
         var checks = [checkbox(path.concat([isMob ? "first_kill" : "first_break"]), drop[isMob ? "first_kill" : "first_break"], isMob ? "Once per player (first_kill)" : "Once per player (first_break)")];
         if (isMob && trigger === "death" && !isExperience) checks.push(checkbox(path.concat(["per_player"]), drop.per_player, "Own roll for every attacker (per_player)"));
@@ -1217,8 +1199,8 @@
         var fields = [
             field("Removes", select(["meta", "removal", index], mode, [["item", "an item"], ["tag", "an item tag"], ["all", "every item (*)"], ["experience", "experience"], ["conditional", "an item, with conditions"]], { "data-action-change": "set-removal-mode", "data-index": String(index) }))
         ];
-        if (mode === "item" || mode === "tag") fields.push(field(mode === "tag" ? "Item tag" : "Item", textInput(path, entry, { list: "gen-removal-items", placeholder: mode === "tag" ? "#minecraft:wool" : "minecraft:rotten_flesh" })));
-        if (mode === "conditional") fields.push(field("Item, #tag or *", textInput(path.concat(["item"]), entry.item, { list: "gen-removal-items" })));
+        if (mode === "item" || mode === "tag") fields.push(field(mode === "tag" ? "Item tag" : "Item", textInput(path, entry, { list: suggest("removal-items"), placeholder: mode === "tag" ? "#minecraft:wool" : "minecraft:rotten_flesh" })));
+        if (mode === "conditional") fields.push(field("Item, #tag or *", textInput(path.concat(["item"]), entry.item, { list: suggest("removal-items") })));
         var parts = [
             el("div", { className: "gen-card__head" }, [
                 el("h4", { className: "gen-card__title" }, ["Removal " + (index + 1)]),
@@ -1994,7 +1976,6 @@
         }
     }
 
-    buildDatalists();
     loadFromHash();
     render();
 

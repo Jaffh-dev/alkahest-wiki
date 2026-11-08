@@ -19,6 +19,11 @@
 
     var enchantList = tool.querySelector("[data-enchant-list]");
 
+    /** Gives an input the autocomplete list of vanilla ids (assets/js/core/id-suggestions.js). */
+    function suggest(input, name) {
+        if (input && Alkahest.idSuggestions) Alkahest.idSuggestions.attach(input, name);
+    }
+
     /** Adds one enchantment row: id, level and a remove button. */
     function addEnchantRow(id, level) {
         var el = Alkahest.site.el;
@@ -27,6 +32,7 @@
             el("label", null, ["Level", el("input", { type: "number", "data-enchant-level": true, value: String(level === undefined ? 3 : level), min: "0", max: "255", step: "1" })]),
             el("button", { type: "button", className: "button button--ghost tool__remove", "data-remove-enchant": true, "aria-label": "Remove this enchantment" }, ["Remove"])
         ]);
+        suggest(row.querySelector("[data-enchant-id]"), "enchantments");
         enchantList.appendChild(row);
         return row;
     }
@@ -67,6 +73,7 @@
         var kind = value("kind");
         var by = value("by");
         updateVisibility(kind, by);
+        suggest(field("target"), kind === "block" ? "block-ids" : "mob-ids");
         by = value("by");
 
         var notes = [];
@@ -138,6 +145,8 @@
         }
         build();
     });
+    suggest(field("killer"), "mob-ids");
+    suggest(field("only"), "only");
     addEnchantRow("", 3);
     build();
 })();
